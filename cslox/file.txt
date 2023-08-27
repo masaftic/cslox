@@ -1,0 +1,5 @@
+print 3 + 3;
+var a = 4;
+while (a >= 4) {
+	print a + 1;
+}

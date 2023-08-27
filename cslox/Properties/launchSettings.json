@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "cslox": {
+      "commandName": "Project",
+      "commandLineArgs": ""
+    }
+  }
+}

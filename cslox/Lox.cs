@@ -1,5 +1,7 @@
 ﻿
 
+using System.Diagnostics.Contracts;
+
 namespace cslox
 {
     class Lox
@@ -9,7 +11,7 @@ namespace cslox
         {
             if (args.Length > 1)
             {
-                Console.WriteLine("Usage: jlox [script]");
+                Console.WriteLine("Usage: cslox [script]");
                 Environment.Exit(64);
             }
             else if (args.Length == 1)
@@ -24,6 +26,7 @@ namespace cslox
 
         private static void runFile(string path)
         {
+
             byte[] bytes = File.ReadAllBytes(path);
             run(System.Text.Encoding.Default.GetString(bytes));
             if (hadError)
