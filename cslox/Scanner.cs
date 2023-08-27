@@ -24,7 +24,7 @@ namespace cslox
             return current >= source.Length;
         }
 
-        List<Token> scanTokens()
+        public List<Token> scanTokens()
         {
             while (!isAtEnd())
             {
@@ -51,14 +51,50 @@ namespace cslox
                 case '+': addToken(TokenType.PLUS); break;
                 case ';': addToken(TokenType.SEMICOLON); break;
                 case '*': addToken(TokenType.STAR); break;
-                
+                case '/':
+                    if (match('/'))
+                    {
+                        while (peek() != '\n' && !isAtEnd()) advance();
+                    }
+                    else
+                    {
+                        addToken(TokenType.SLASH); 
+                    }
+                    break;
+                case ' ':
+                case '\r':
+                case '\t':
+                    break;
+                case '\n':
+                    line++;
+                    break;
+                case '!':
+                    addToken(match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
+                    break;
+                case '=':
+                    addToken(match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
+                    break;
+                case '<':
+                    addToken(match('=') ? TokenType.LESS_EQUAL : TokenType.LESS_EQUAL);
+                    break;
+                case '>':
+                    addToken(match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
+                    break;
+                default:
+                    Lox.error(line, "Unexpected character.");
+                    break;
             }
+        }
+
+        private char peek()
+        {
+            if (isAtEnd()) return '\0';
+            return source.ElementAt(current);
         }
 
         private char advance()
         {
-            current++;
-            return source.ElementAt(current - 1);
+            return source.ElementAt(current++);
         }
 
         private void addToken(TokenType type)
@@ -68,8 +104,20 @@ namespace cslox
 
         private void addToken(TokenType type, object literal)
         {
-            string text = source.Substring(start, current);
+            string text = source.Substring(start, current - start);
             tokens.Add(new Token(type, text, literal, line));
         }
+
+        private Boolean match(char expected)
+        {
+            if (isAtEnd()) return false;
+
+            if (source.ElementAt(current) != expected) return false;
+
+            current++;
+            return true;
+        }
+
     }
+
 }

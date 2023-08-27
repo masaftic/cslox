@@ -22,6 +22,8 @@ namespace cslox
             this.line = line;
         }
 
+
+
         public string toString()
         {
             return type + " " + lexeme + " " + literal;

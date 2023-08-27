@@ -50,15 +50,15 @@ namespace cslox
         private static void run(String source)
         {
             Scanner scanner = new Scanner(source);
-            List<Token> tokens = scanner.Scantokens();
+            List<Token> tokens = scanner.scanTokens();
 
             foreach (Token token in tokens)
             {
-                Console.WriteLine(token);
+                Console.WriteLine(token.toString());
             }
         }
 
-        static void error(int line, string message)
+        public static void error(int line, string message)
         {
             report(line, "", message);
         }
@@ -66,7 +66,8 @@ namespace cslox
         private static void report(int line, string where, string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.Error.Write("[line {0}] Error{1}: {2}", line, where, message);
+            Console.Error.WriteLine("[line {0}] Error{1}: {2}", line, where, message);
+            Console.ResetColor();
             hadError = true;
         }
     }
