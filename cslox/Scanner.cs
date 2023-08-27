@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,6 +11,7 @@ namespace cslox
     {
         private readonly string source;
         private readonly List<Token> tokens = new List<Token>();
+        private static readonly Dictionary<string, TokenType> keywords;
         private int start = 0;
         private int current = 0;
         private int line = 1;
@@ -19,7 +21,31 @@ namespace cslox
             this.source = source;
         }
 
-        private Boolean isAtEnd()
+        static Scanner()
+        {
+            keywords = new Dictionary<string, TokenType>
+            {
+                { "and", TokenType.AND },
+                { "class", TokenType.CLASS },
+                { "else", TokenType.ELSE },
+                { "false", TokenType.FALSE },
+                { "for", TokenType.FOR },
+                { "fun", TokenType.FUN },
+                { "if", TokenType.IF },
+                { "nil", TokenType.NIL },
+                { "or", TokenType.OR },
+                { "print", TokenType.PRINT },
+                { "return", TokenType.RETURN },
+                { "super", TokenType.SUPER },
+                { "this", TokenType.THIS },
+                { "true", TokenType.TRUE },
+                { "var", TokenType.VAR },
+                { "while", TokenType.WHILE }
+            };
+        }
+
+
+        private bool isAtEnd()
         {
             return current >= source.Length;
         }
@@ -80,16 +106,31 @@ namespace cslox
                 case '>':
                     addToken(match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
                     break;
+                case '"':
+                    stringToken();
+                    break;
+
                 default:
-                    Lox.error(line, "Unexpected character.");
+                    if (char.IsNumber(c))
+                    {
+                        numberToken();
+                    }
+                    else if (isAlpha(c))
+                    {
+                        identifierToken();
+                    }
+                    else
+                    {
+                        Lox.error(line, "Unexpected character.");
+                    }
                     break;
             }
         }
 
-        private char peek()
+        private char peek(int ahead = 0)
         {
             if (isAtEnd()) return '\0';
-            return source.ElementAt(current);
+            return source.ElementAt(current + ahead);
         }
 
         private char advance()
@@ -108,7 +149,7 @@ namespace cslox
             tokens.Add(new Token(type, text, literal, line));
         }
 
-        private Boolean match(char expected)
+        private bool match(char expected)
         {
             if (isAtEnd()) return false;
 
@@ -116,6 +157,66 @@ namespace cslox
 
             current++;
             return true;
+        }
+
+        private void stringToken()
+        {
+            while (peek() != '"' && !isAtEnd())
+            {
+                if (peek() == '\n') 
+                {
+                    line++;
+                }
+                advance();
+            }
+
+            if (isAtEnd() )
+            {
+                Lox.error(line, "Unterminated string.");
+                return;
+            }
+            // The closing "
+            advance();
+            
+            string value =  source.Substring(start + 1, current - start - 2);
+            addToken(TokenType.STRING, value);
+        }
+
+        private void numberToken()
+        {
+            while (char.IsNumber(peek())) advance();
+
+            if (peek() == '.' && char.IsNumber(peek(1)))
+            {
+                advance();
+                while (char.IsNumber(peek())) advance();
+            }
+
+            addToken(TokenType.NUMBER, Double.Parse(source.Substring(start, current - start)));
+        }
+        private bool isAlpha(char c)
+        {
+            return char.IsLetter(c) || c == '_';
+        }
+
+        private bool isAlphaNumeric(char c)
+        {
+            return isAlpha(c) || char.IsDigit(c);
+        }
+
+        private void identifierToken()
+        {
+            while (isAlphaNumeric(peek())) advance();
+
+            string text = source.Substring(start, current - start);
+
+            TokenType type;
+            bool isKeyword = keywords.TryGetValue(text, out type);
+            if (!isKeyword)
+            {
+                type = TokenType.IDENTIFIER;
+            }
+            addToken(type);
         }
 
     }
