@@ -24,13 +24,30 @@ namespace cslox
 
         private static void RunFile(string path)
         {
-
-            byte[] bytes = File.ReadAllBytes(path);
-            Run(System.Text.Encoding.Default.GetString(bytes));
+            byte[] bytes = null;
+            try
+            {
+                bytes = File.ReadAllBytes(path);   
+            }
+            catch (FileNotFoundException) {
+                Console.WriteLine("File not Found");
+                hadError = true;
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine("An error occurred while accessing the file: " + e.Message);
+                hadError = true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("An unexpected error occurred: " + e.Message);
+                hadError = true;
+            }
             if (hadError)
             {
                 Environment.Exit(65);
             }
+            Run(System.Text.Encoding.Default.GetString(bytes));
         }
 
         private static void RunPrompt() 

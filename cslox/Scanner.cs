@@ -143,9 +143,9 @@ namespace cslox
             AddToken(type, null);
         }
 
-        private void AddToken(TokenType type, object literal)
+        private void AddToken(TokenType type, object? literal)
         {
-            string text = source.Substring(start, current - start);
+            string text = source[start..current];
             tokens.Add(new Token(type, text, literal, line));
         }
 
@@ -178,7 +178,7 @@ namespace cslox
             // The closing "
             Advance();
             
-            string value =  source.Substring(start + 1, current - start - 2);
+            string value = source[(start+1)..(current-1)];
             AddToken(TokenType.STRING, value);
         }
 
@@ -192,7 +192,7 @@ namespace cslox
                 while (char.IsNumber(Peek())) Advance();
             }
 
-            AddToken(TokenType.NUMBER, Double.Parse(source.Substring(start, current - start)));
+            AddToken(TokenType.NUMBER, Double.Parse(source[start..current]));
         }
         private bool IsAlpha(char c)
         {

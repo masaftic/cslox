@@ -1,5 +1,9 @@
-print 3 + 3;
+// print 3 + 3;
 var a = 4;
 while (a >= 4) {
 	print a + 1;
+}
+
+for (var a = 0; a <= 10; a = a + 1) {
+
 }
