@@ -45,46 +45,46 @@ namespace cslox
         }
 
 
-        private bool isAtEnd()
+        private bool IsAtEnd()
         {
             return current >= source.Length;
         }
 
-        public List<Token> scanTokens()
+        public List<Token> ScanTokens()
         {
-            while (!isAtEnd())
+            while (!IsAtEnd())
             {
                 start = current;
-                scanToken();
+                ScanToken();
             }
 
             tokens.Add(new Token(TokenType.EOF, "", null, line));
             return tokens;
         }
 
-        private void scanToken()
+        private void ScanToken()
         {
-            char c = advance();
+            char c = Advance();
             switch (c)
             {
-                case '(': addToken(TokenType.LEFT_PAREN); break;
-                case ')': addToken(TokenType.RIGHT_PAREN); break;
-                case '{': addToken(TokenType.LEFT_BRACE); break;
-                case '}': addToken(TokenType.RIGHT_BRACE); break;
-                case ',': addToken(TokenType.COMMA); break;
-                case '.': addToken(TokenType.DOT); break;
-                case '-': addToken(TokenType.MINUS); break;
-                case '+': addToken(TokenType.PLUS); break;
-                case ';': addToken(TokenType.SEMICOLON); break;
-                case '*': addToken(TokenType.STAR); break;
+                case '(': AddToken(TokenType.LEFT_PAREN); break;
+                case ')': AddToken(TokenType.RIGHT_PAREN); break;
+                case '{': AddToken(TokenType.LEFT_BRACE); break;
+                case '}': AddToken(TokenType.RIGHT_BRACE); break;
+                case ',': AddToken(TokenType.COMMA); break;
+                case '.': AddToken(TokenType.DOT); break;
+                case '-': AddToken(TokenType.MINUS); break;
+                case '+': AddToken(TokenType.PLUS); break;
+                case ';': AddToken(TokenType.SEMICOLON); break;
+                case '*': AddToken(TokenType.STAR); break;
                 case '/':
-                    if (match('/'))
+                    if (Match('/'))
                     {
-                        while (peek() != '\n' && !isAtEnd()) advance();
+                        while (Peek() != '\n' && !IsAtEnd()) Advance();
                     }
                     else
                     {
-                        addToken(TokenType.SLASH); 
+                        AddToken(TokenType.SLASH); 
                     }
                     break;
                 case ' ':
@@ -95,63 +95,63 @@ namespace cslox
                     line++;
                     break;
                 case '!':
-                    addToken(match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
+                    AddToken(Match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
                     break;
                 case '=':
-                    addToken(match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
+                    AddToken(Match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
                     break;
                 case '<':
-                    addToken(match('=') ? TokenType.LESS_EQUAL : TokenType.LESS_EQUAL);
+                    AddToken(Match('=') ? TokenType.LESS_EQUAL : TokenType.LESS_EQUAL);
                     break;
                 case '>':
-                    addToken(match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
+                    AddToken(Match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
                     break;
                 case '"':
-                    stringToken();
+                    StringToken();
                     break;
 
                 default:
                     if (char.IsNumber(c))
                     {
-                        numberToken();
+                        NumberToken();
                     }
-                    else if (isAlpha(c))
+                    else if (IsAlpha(c))
                     {
-                        identifierToken();
+                        IdentifierToken();
                     }
                     else
                     {
-                        Lox.error(line, "Unexpected character.");
+                        Lox.Error(line, "Unexpected character.");
                     }
                     break;
             }
         }
 
-        private char peek(int ahead = 0)
+        private char Peek(int ahead = 0)
         {
-            if (isAtEnd()) return '\0';
+            if (IsAtEnd()) return '\0';
             return source.ElementAt(current + ahead);
         }
 
-        private char advance()
+        private char Advance()
         {
             return source.ElementAt(current++);
         }
 
-        private void addToken(TokenType type)
+        private void AddToken(TokenType type)
         {
-            addToken(type, null);
+            AddToken(type, null);
         }
 
-        private void addToken(TokenType type, object literal)
+        private void AddToken(TokenType type, object literal)
         {
             string text = source.Substring(start, current - start);
             tokens.Add(new Token(type, text, literal, line));
         }
 
-        private bool match(char expected)
+        private bool Match(char expected)
         {
-            if (isAtEnd()) return false;
+            if (IsAtEnd()) return false;
 
             if (source.ElementAt(current) != expected) return false;
 
@@ -159,54 +159,54 @@ namespace cslox
             return true;
         }
 
-        private void stringToken()
+        private void StringToken()
         {
-            while (peek() != '"' && !isAtEnd())
+            while (Peek() != '"' && !IsAtEnd())
             {
-                if (peek() == '\n') 
+                if (Peek() == '\n') 
                 {
                     line++;
                 }
-                advance();
+                Advance();
             }
 
-            if (isAtEnd() )
+            if (IsAtEnd())
             {
-                Lox.error(line, "Unterminated string.");
+                Lox.Error(line, "Unterminated string.");
                 return;
             }
             // The closing "
-            advance();
+            Advance();
             
             string value =  source.Substring(start + 1, current - start - 2);
-            addToken(TokenType.STRING, value);
+            AddToken(TokenType.STRING, value);
         }
 
-        private void numberToken()
+        private void NumberToken()
         {
-            while (char.IsNumber(peek())) advance();
+            while (char.IsNumber(Peek())) Advance();
 
-            if (peek() == '.' && char.IsNumber(peek(1)))
+            if (Peek() == '.' && char.IsNumber(Peek(1)))
             {
-                advance();
-                while (char.IsNumber(peek())) advance();
+                Advance();
+                while (char.IsNumber(Peek())) Advance();
             }
 
-            addToken(TokenType.NUMBER, Double.Parse(source.Substring(start, current - start)));
+            AddToken(TokenType.NUMBER, Double.Parse(source.Substring(start, current - start)));
         }
-        private bool isAlpha(char c)
+        private bool IsAlpha(char c)
         {
             return char.IsLetter(c) || c == '_';
         }
 
-        private bool isAlphaNumeric(char c)
+        private bool IsAlphaNumeric(char c)
         {
-            return isAlpha(c) || char.IsDigit(c);
+            return IsAlpha(c) || char.IsDigit(c);
         }
 
-        private void identifierToken()
+        private void IdentifierToken()
         {
-            while (isAlphaNumeric(peek())) advance();
+            while (IsAlphaNumeric(Peek())) Advance();
 
             string text = source.Substring(start, current - start);
 
@@ -216,7 +216,7 @@ namespace cslox
             {
                 type = TokenType.IDENTIFIER;
             }
-            addToken(type);
+            AddToken(type);
         }
 
     }

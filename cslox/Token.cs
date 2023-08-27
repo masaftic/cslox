@@ -24,7 +24,7 @@ namespace cslox
 
 
 
-        public string toString()
+        public override string ToString()
         {
             return type + " " + lexeme + " " + literal;
         }

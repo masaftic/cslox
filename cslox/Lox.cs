@@ -1,7 +1,5 @@
 ﻿
 
-using System.Diagnostics.Contracts;
-
 namespace cslox
 {
     class Lox
@@ -16,26 +14,26 @@ namespace cslox
             }
             else if (args.Length == 1)
             {
-                runFile(args[0]);
+                RunFile(args[0]);
             }
             else
             {
-                runPrompt();
+                RunPrompt();
             }
         }
 
-        private static void runFile(string path)
+        private static void RunFile(string path)
         {
 
             byte[] bytes = File.ReadAllBytes(path);
-            run(System.Text.Encoding.Default.GetString(bytes));
+            Run(System.Text.Encoding.Default.GetString(bytes));
             if (hadError)
             {
                 Environment.Exit(65);
             }
         }
 
-        private static void runPrompt() 
+        private static void RunPrompt() 
         {
             using (StreamReader input = new StreamReader(Console.OpenStandardInput()))
             {
@@ -44,29 +42,29 @@ namespace cslox
                     Console.Write("> ");
                     string? line = input.ReadLine();
                     if (line == null) break;
-                    run(line);
+                    Run(line);
                     hadError = false;
                 }
             }
         }
        
-        private static void run(String source)
+        private static void Run(String source)
         {
             Scanner scanner = new Scanner(source);
-            List<Token> tokens = scanner.scanTokens();
+            List<Token> tokens = scanner.ScanTokens();
 
             foreach (Token token in tokens)
             {
-                Console.WriteLine(token.toString());
+                Console.WriteLine(token.ToString());
             }
         }
 
-        public static void error(int line, string message)
+        public static void Error(int line, string message)
         {
-            report(line, "", message);
+            Report(line, "", message);
         }
 
-        private static void report(int line, string where, string message)
+        private static void Report(int line, string where, string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Error.WriteLine("[line {0}] Error{1}: {2}", line, where, message);
