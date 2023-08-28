@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace cslox
 {
-    class Token
+    public class Token
     {
         readonly TokenType type;
         readonly string lexeme;

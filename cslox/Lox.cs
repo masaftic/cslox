@@ -24,7 +24,7 @@ namespace cslox
 
         private static void RunFile(string path)
         {
-            byte[] bytes = null;
+            byte[]? bytes = null;
             try
             {
                 bytes = File.ReadAllBytes(path);   
@@ -65,7 +65,7 @@ namespace cslox
             }
         }
        
-        private static void Run(String source)
+        private static void Run(string source)
         {
             Scanner scanner = new Scanner(source);
             List<Token> tokens = scanner.ScanTokens();

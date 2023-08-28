@@ -45,10 +45,10 @@ namespace cslox
         }
 
 
-        private bool IsAtEnd()
+        private bool IsAtEnd(int ahead = 0)
         {
-            return current >= source.Length;
-        }
+            return current + ahead >= source.Length;
+        }   
 
         public List<Token> ScanTokens()
         {
@@ -81,6 +81,10 @@ namespace cslox
                     if (Match('/'))
                     {
                         while (Peek() != '\n' && !IsAtEnd()) Advance();
+                    }
+                    else if (Match('*'))
+                    {
+                        MultiLineComment();
                     }
                     else
                     {
@@ -127,9 +131,27 @@ namespace cslox
             }
         }
 
+        private void MultiLineComment()
+        {
+            int depth = 1;
+            while (depth > 0)
+            {
+                if (IsAtEnd())
+                {
+                    return;
+                }
+
+                if (Peek() == '/' && Peek(1) == '*') depth++;
+                else if (Peek() == '*' && Peek(1) == '/') depth--;
+                Advance();
+            }
+            Advance();
+            Advance();
+        }
+
         private char Peek(int ahead = 0)
         {
-            if (IsAtEnd()) return '\0';
+            if (IsAtEnd(ahead)) return '\0';
             return source.ElementAt(current + ahead);
         }
 
