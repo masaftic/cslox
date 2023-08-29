@@ -9,10 +9,10 @@ namespace cslox
 {
     public class Token
     {
-        readonly TokenType type;
+        public readonly TokenType type;
         public readonly string lexeme;
-        readonly object? literal;
-        readonly int line;
+        public readonly object? literal;
+        public readonly int line;
 
         public Token(TokenType type, string lexeme, object? literal, int line)
         {
@@ -21,8 +21,6 @@ namespace cslox
             this.literal = literal;
             this.line = line;
         }
-
-
 
         public override string ToString()
         {

@@ -49,7 +49,7 @@ namespace cslox
     }
     public class Literal : Expr
     {
-        public Literal(object value)
+        public Literal(object? value)
         {
             this.value = value;
 

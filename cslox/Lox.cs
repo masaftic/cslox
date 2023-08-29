@@ -7,31 +7,20 @@ namespace cslox
         static bool hadError = false;
         static void Main(string[] args)
         {
-            // if (args.Length > 1)
-            // {
-            //     Console.WriteLine("Usage: cslox [script]");
-            //     Environment.Exit(64);
-            // }
-            // else if (args.Length == 1)
-            // {
-            //     RunFile(args[0]);
-            // }
-            // else
-            // {
-            //     RunPrompt();
-            // }
-            Expr expression = new Binary(
-                new Unary(
-                    new Token(TokenType.MINUS, "-", null, 1),
-                    new Literal(123)
-                ),
-                new Token(TokenType.STAR, "*", null, 1),
-                new Grouping(
-                    new Literal(45.67)
-                )
-            );
-
-            Console.WriteLine(new AstPrinter().print(expression));
+            if (args.Length > 1)
+            {
+                Console.WriteLine("Usage: cslox [script]");
+                Environment.Exit(64);
+            }
+            else if (args.Length == 1)
+            {
+                RunFile(args[0]);
+            }
+            else
+            {
+                RunPrompt();
+            }
+            
         }
 
         private static void RunFile(string path)
@@ -85,6 +74,26 @@ namespace cslox
             foreach (Token token in tokens)
             {
                 Console.WriteLine(token.ToString());
+            }
+
+            Parser parser = new Parser(tokens);
+            Expr expression = parser.Parse();
+
+            if (hadError) return;
+
+            Console.WriteLine(new AstPrinter().Print(expression));
+        }
+
+
+        public static void Error(Token token, string message)
+        {
+            if (token.type == TokenType.EOF)
+            {
+                Report(token.line, " at end", message);
+            }
+            else
+            {
+                Report(token.line, " at '" + token.lexeme + "'", message);
             }
         }
 
