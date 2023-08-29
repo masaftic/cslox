@@ -16,7 +16,7 @@ term        → factor ( ( "-" | "+" ) factor )* ;
 ```
 
 ```
-factor      → unary ( ( "/" | "\*" ) unary )* ;
+factor      → unary ( ( "/" | "*" ) unary )* ;
 ```
 
 
