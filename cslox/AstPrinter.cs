@@ -10,7 +10,7 @@ namespace cslox {
 
         public string VisitBinaryExpr(Binary expr)
         {
-            return Parenthesize(expr._operator.lexeme, expr.left, expr.right);
+            return Parenthesize(expr.@operator.lexeme, expr.left, expr.right);
         }
         
         public string VisitGroupingExpr(Grouping expr)
@@ -26,7 +26,7 @@ namespace cslox {
 
         public string VisitUnaryExpr(Unary expr)
         {
-            return Parenthesize(expr._operator.lexeme, expr.right);
+            return Parenthesize(expr.@operator.lexeme, expr.right);
         }
 
         private string Parenthesize(string name, params Expr[] exprs)

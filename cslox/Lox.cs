@@ -1,10 +1,16 @@
 ﻿
 
+using System.Runtime.ConstrainedExecution;
+
 namespace cslox
 {
     class Lox
     {
         static bool hadError = false;
+        static bool hadRuntimeError;
+        static readonly Interpreter interpreter = new Interpreter();
+
+
         static void Main(string[] args)
         {
             if (args.Length > 1)
@@ -48,6 +54,10 @@ namespace cslox
             {
                 Environment.Exit(65);
             }
+            if (hadRuntimeError)
+            {
+                Environment.Exit(70);
+            }
             Run(System.Text.Encoding.Default.GetString(bytes));
         }
 
@@ -71,17 +81,12 @@ namespace cslox
             Scanner scanner = new Scanner(source);
             List<Token> tokens = scanner.ScanTokens();
 
-            foreach (Token token in tokens)
-            {
-                Console.WriteLine(token.ToString());
-            }
-
             Parser parser = new Parser(tokens);
             Expr expression = parser.Parse();
 
             if (hadError) return;
 
-            Console.WriteLine(new AstPrinter().Print(expression));
+            interpreter.Interpret(expression);
         }
 
 
@@ -108,6 +113,15 @@ namespace cslox
             Console.Error.WriteLine("[line {0}] Error{1}: {2}", line, where, message);
             Console.ResetColor();
             hadError = true;
+        }
+
+        public static void RuntimeError(RuntimeError error)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            // Console.Error.WriteLine(error.Message + "\n[line " + error.token.line + "]");
+            Console.Error.WriteLine(error.Message);
+            Console.ResetColor();
+            hadRuntimeError = true;
         }
     }
 }

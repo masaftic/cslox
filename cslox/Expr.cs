@@ -14,10 +14,10 @@ namespace cslox
     }
     public class Binary : Expr
     {
-        public Binary(Expr left, Token _operator, Expr right)
+        public Binary(Expr left, Token @operator, Expr right)
         {
             this.left = left;
-            this._operator = _operator;
+            this.@operator = @operator;
             this.right = right;
 
         }
@@ -29,7 +29,7 @@ namespace cslox
 
 
         public readonly Expr left;
-        public readonly Token _operator;
+        public readonly Token @operator;
         public readonly Expr right;
     }
     public class Grouping : Expr
@@ -65,9 +65,9 @@ namespace cslox
     }
     public class Unary : Expr
     {
-        public Unary(Token _operator, Expr right)
+        public Unary(Token @operator, Expr right)
         {
-            this._operator = _operator;
+            this.@operator = @operator;
             this.right = right;
         }
 
@@ -77,7 +77,7 @@ namespace cslox
         }
 
 
-        public readonly Token _operator;
+        public readonly Token @operator;
         public readonly Expr right;
     }
 }

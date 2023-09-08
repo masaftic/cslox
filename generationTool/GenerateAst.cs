@@ -18,10 +18,10 @@ public class GenerateAst
         Console.Write(outputDir);
         DefineAst(outputDir, "Expr", new List<string>
         {
-            "Binary : Expr left, Token _operator, Expr right",
+            "Binary : Expr left, Token @operator, Expr right",
             "Grouping : Expr expression",
             "Literal : object value",
-            "Unary : Token _operator, Expr right"
+            "Unary : Token @operator, Expr right"
         });
     }
 

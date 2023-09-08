@@ -37,9 +37,9 @@ namespace cslox
             Expr expr = Comparison();
             while (Match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL))
             {
-                Token _operator = Previous();
+                Token @operator = Previous();
                 Expr right = Comparison();
-                expr = new Binary(expr, _operator, right);
+                expr = new Binary(expr, @operator, right);
             }
 
             return expr;
@@ -51,9 +51,9 @@ namespace cslox
 
             while (Match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL))
             {
-                Token _operator = Previous();
+                Token @operator = Previous();
                 Expr right = Term();
-                expr = new Binary(expr, _operator, right);
+                expr = new Binary(expr, @operator, right);
             }
 
             return expr;
@@ -64,9 +64,9 @@ namespace cslox
             Expr expr = Factor();
             while (Match(TokenType.MINUS, TokenType.PLUS))
             {
-                Token _operator = Previous();
+                Token @operator = Previous();
                 Expr right = Factor();
-                expr = new Binary(expr, _operator, right);
+                expr = new Binary(expr, @operator, right);
             }
 
             return expr;
@@ -77,9 +77,9 @@ namespace cslox
             Expr expr = Unary_();
             while (Match(TokenType.SLASH, TokenType.STAR))
             {
-                Token _operator = Previous();
+                Token @operator = Previous();
                 Expr right = Unary_();
-                expr = new Binary(expr, _operator, right);
+                expr = new Binary(expr, @operator, right);
             }
 
             return expr;
