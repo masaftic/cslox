@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace cslox
 {
-    class Interpreter : IVisitor<object>
+    class Interpreter : Expr.IVisitor<object>
     {
 
         public void Interpret(Expr expression)
@@ -152,5 +152,7 @@ namespace cslox
 
             return value.ToString();
         }
+
+        
     }
 }

@@ -23,6 +23,12 @@ public class GenerateAst
             "Literal : object value",
             "Unary : Token @operator, Expr right"
         });
+
+        DefineAst(outputDir, "Stmt", new List<string>
+        {
+            "Expression : Expr expression",
+            "Print      : Expr expression"
+        });
     }
 
     static void DefineAst(string outputDir, string baseName, List<string> types)
@@ -38,9 +44,9 @@ public class GenerateAst
             writer.WriteLine("    public abstract class " + baseName);
             writer.WriteLine("    {");
             writer.WriteLine("        public abstract R Accept<R>(IVisitor<R> visitor);");
-            writer.WriteLine("    }");
-
             DefineVisitor(writer, baseName, types);
+
+            writer.WriteLine("    }");
             foreach (string type in types)
             {
                 string className = type.Split(':')[0].Trim();

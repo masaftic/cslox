@@ -1,9 +1,8 @@
 using System.Text;
 
 namespace cslox {
-    class AstPrinter : IVisitor<string>
+    class AstPrinter : Expr.IVisitor<string>
     {
-
         public string Print(Expr expr) {
             return expr.Accept(this);
         }
