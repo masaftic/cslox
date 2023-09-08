@@ -18,6 +18,7 @@ public class GenerateAst
         Console.Write(outputDir);
         DefineAst(outputDir, "Expr", new List<string>
         {
+            "Assign : Token name, Expr value",
             "Binary : Expr left, Token @operator, Expr right",
             "Grouping : Expr expression",
             "Literal : object value",
@@ -29,7 +30,7 @@ public class GenerateAst
         {
             "Expression : Expr expression",
             "Print      : Expr expression",
-            "Var        : Token name, Expr initializer"
+            "Var        : Token name, Expr? initializer"
         });
     }
 

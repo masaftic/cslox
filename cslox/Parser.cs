@@ -1,4 +1,5 @@
 using System.IO.Pipes;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
 namespace cslox
@@ -76,7 +77,29 @@ namespace cslox
 
         Expr Expression()
         {
-            return Equality();
+            return Assignment();
+        }
+
+        Expr Assignment()
+        {
+            Expr expr = Equality();
+
+            if (Match(TokenType.EQUAL))
+            {
+                Token equals = Previous();
+                Expr value = Assignment();
+
+                if (expr is Variable)
+                {
+                    Token name = ((Variable)expr).name;
+
+                    return new Assign(name, value);
+                }
+
+                Error(equals, "Invalid assignment target.");
+            }
+
+            return expr;
         }
 
         Expr Equality()
@@ -131,7 +154,6 @@ namespace cslox
 
             return expr;
         }
-
 
         Expr Unary_()
         {

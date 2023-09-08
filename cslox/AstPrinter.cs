@@ -7,6 +7,11 @@ namespace cslox {
             return expr.Accept(this);
         }
 
+        public string VisitAssignExpr(Assign assign)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VisitBinaryExpr(Binary expr)
         {
             return Parenthesize(expr.@operator.lexeme, expr.left, expr.right);

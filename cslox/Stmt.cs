@@ -4,7 +4,7 @@ namespace cslox
     public abstract class Stmt
     {
         public abstract R Accept<R>(IVisitor<R> visitor);
-        public interface IVisitor<R>
+        public interface IVisitor<R>    
         {
             R VisitExpressionStmt(Expression expression);
             R VisitPrintStmt(Print print);
@@ -15,7 +15,7 @@ namespace cslox
     {
         public Expression(Expr expression)
         {
-            this.expression = expression;
+             this.expression = expression;
         }
 
         public override R Accept<R>(IVisitor<R> visitor)
@@ -30,7 +30,7 @@ namespace cslox
     {
         public Print(Expr expression)
         {
-            this.expression = expression;
+             this.expression = expression;
         }
 
         public override R Accept<R>(IVisitor<R> visitor)
@@ -45,8 +45,8 @@ namespace cslox
     {
         public Var(Token name, Expr? initializer)
         {
-            this.name = name;
-            this.initializer = initializer;
+             this.name = name;
+             this.initializer = initializer;
         }
 
         public override R Accept<R>(IVisitor<R> visitor)

@@ -1,4 +1,12 @@
 
 var a = 1;
 var b = 2;
+var c = "Hello world";
 print a * b;
+print c;
+a = 5;
+c = "Hello";
+print a * b;
+print c;
+var d = 1;
+print d = 34;
