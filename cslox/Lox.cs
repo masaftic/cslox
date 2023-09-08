@@ -1,5 +1,6 @@
 ﻿
 
+using System.Linq.Expressions;
 using System.Runtime.ConstrainedExecution;
 
 namespace cslox
@@ -82,11 +83,14 @@ namespace cslox
             List<Token> tokens = scanner.ScanTokens();
 
             Parser parser = new Parser(tokens);
-            Expr expression = parser.Parse();
+            List<Stmt> statements = parser.Parse();
 
             if (hadError) return;
+            if (hadRuntimeError) return;
 
-            interpreter.Interpret(expression);
+            interpreter.Interpret(statements);
+            
+      
         }
 
 

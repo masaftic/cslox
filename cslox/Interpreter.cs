@@ -7,25 +7,48 @@ using System.Threading.Tasks;
 
 namespace cslox
 {
-    class Interpreter : Expr.IVisitor<object>
+    class Interpreter : Expr.IVisitor<object>,
+                        Stmt.IVisitor<object>
     {
 
-        public void Interpret(Expr expression)
+        public void Interpret(List<Stmt> statements)
         {
             try
             {
-                object value = Evaluate(expression);
-                Console.WriteLine(Stringify(value));
+                foreach (Stmt statement in statements)
+                {
+                    Execute(statement);
+                }
             } catch (RuntimeError error)
             {
                 Lox.RuntimeError(error);
             }
         }
 
+        void Execute(Stmt statement)
+        {
+            statement.Accept(this);
+        }
+
         public object Evaluate(Expr expr)
         {
             return expr.Accept(this);
         }
+
+
+        public object VisitExpressionStmt(Expression stmt)
+        {
+            Evaluate(stmt.expression); 
+            return null;
+        }
+
+        public object VisitPrintStmt(Print stmt)
+        {
+            object value = Evaluate(stmt.expression);
+            Console.WriteLine(Stringify(value));
+            return null;
+        }
+
       
 
         public object VisitBinaryExpr(Binary expr)
@@ -79,7 +102,6 @@ namespace cslox
             }
         }
      
-
         public object VisitGroupingExpr(Grouping expr)
         {
             return Evaluate(expr.expression);
@@ -153,6 +175,8 @@ namespace cslox
             return value.ToString();
         }
 
-        
+
+
+       
     }
 }

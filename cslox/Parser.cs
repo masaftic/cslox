@@ -15,16 +15,37 @@ namespace cslox
             this.tokens = tokens;
         }
 
-        public Expr Parse()
+        public List<Stmt> Parse()
         {
-            try
+            List<Stmt> statements = new List<Stmt>();
+            while (!IsAtEnd())
             {
-                return Expression();
+                statements.Add(Statement());
             }
-            catch (ParseError error)
+            return statements;
+        }
+
+        Stmt Statement()
+        {
+            if (Match(TokenType.PRINT))
             {
-                return null;
+                return PrintStatement();
             }
+            return ExpressionStatement();
+        }
+
+        Stmt ExpressionStatement()
+        {
+            Expr expr = Expression();
+            Consume(TokenType.SEMICOLON, "Expect ';' after expression.");
+            return new Expression(expr);
+        }
+
+        Stmt PrintStatement()
+        {
+            Expr value = Expression();
+            Consume(TokenType.SEMICOLON, "Expect ';' after value.");
+            return new Print(value);
         }
 
         Expr Expression()
