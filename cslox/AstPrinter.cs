@@ -28,6 +28,11 @@ namespace cslox {
             return Parenthesize(expr.@operator.lexeme, expr.right);
         }
 
+        public string VisitVariableExpr(Variable variable)
+        {
+            throw new NotImplementedException();
+        }
+
         private string Parenthesize(string name, params Expr[] exprs)
         {
             var builder = new StringBuilder();

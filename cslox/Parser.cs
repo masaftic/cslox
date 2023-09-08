@@ -20,9 +20,35 @@ namespace cslox
             List<Stmt> statements = new List<Stmt>();
             while (!IsAtEnd())
             {
-                statements.Add(Statement());
+                statements.Add(Declaration());
             }
             return statements;
+        }
+
+        Stmt Declaration()
+        {
+            try
+            {
+                if (Match(TokenType.VAR)) return VarDeclaration();
+
+                return Statement();
+            } catch (ParseError error)
+            {
+                Synchronize();
+                return null;
+            }
+        }
+
+        Stmt VarDeclaration()
+        {
+            Token name = Consume(TokenType.IDENTIFIER, "Expect variable name.");
+
+            Expr? initiallizer = null;
+
+            if (Match(TokenType.EQUAL)) initiallizer = Expression();
+
+            Consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
+            return new Var(name, initiallizer);
         }
 
         Stmt Statement()
@@ -111,9 +137,9 @@ namespace cslox
         {
             if (Match(TokenType.BANG, TokenType.MINUS))
             {
-                Token _opeartor = Previous();
+                Token @opeartor = Previous();
                 Expr right = Unary_();
-                return new Unary(_opeartor, right);
+                return new Unary(@opeartor, right);
             }
 
             return Primary();
@@ -137,6 +163,12 @@ namespace cslox
                 return new Grouping(expr);
             }
 
+            if (Match(TokenType.IDENTIFIER))
+            {
+                return new Variable(Previous());
+            }
+
+
             throw Error(Peek(), "Expect expression.");
         }
 
@@ -154,7 +186,7 @@ namespace cslox
             return false;
         }
 
-        private Token Consume(TokenType type, string message)
+        Token Consume(TokenType type, string message)
         {
             if (Check(type)) return Advance();
             throw Error(Peek(), message);

@@ -11,6 +11,9 @@ namespace cslox
                         Stmt.IVisitor<object>
     {
 
+        Environment environment = new();
+
+
         public void Interpret(List<Stmt> statements)
         {
             try
@@ -35,7 +38,6 @@ namespace cslox
             return expr.Accept(this);
         }
 
-
         public object VisitExpressionStmt(Expression stmt)
         {
             Evaluate(stmt.expression); 
@@ -49,7 +51,24 @@ namespace cslox
             return null;
         }
 
-      
+
+        public object VisitVariableExpr(Variable expr)
+        {
+            return environment.Get(expr.name);
+        }
+
+        public object VisitVarStmt(Var stmt)
+        {
+            object value = null;
+            if (stmt.initializer != null)
+            {
+                value = Evaluate(stmt.initializer);
+            }
+
+            environment.Define(stmt.name.lexeme, value);
+            return null;
+        }
+
 
         public object VisitBinaryExpr(Binary expr)
         {
@@ -175,8 +194,6 @@ namespace cslox
             return value.ToString();
         }
 
-
-
-       
+        
     }
 }
