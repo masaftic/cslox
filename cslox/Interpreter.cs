@@ -72,6 +72,22 @@ namespace cslox
             return null;
         }
 
+        public object VisitLogicalExpr(Logical expr)
+        {
+            object left = Evaluate(expr.left);
+
+            if (expr.@operator.type == TokenType.OR)
+            {
+                if (IsTruthy(left)) return left;
+            }
+            else 
+            {
+                if (!IsTruthy(left)) return left;
+            }
+
+            return Evaluate(expr.right);
+        }
+        
         public object VisitExpressionStmt(Expression stmt)
         {
             Evaluate(stmt.expression);
@@ -217,8 +233,6 @@ namespace cslox
 
         private static bool IsEqual(object left, object right)
         {
-            if (left == null || right == null) return true;
-            if (left == null) return false;
             return Equals(left, right);
         }
 
@@ -239,6 +253,6 @@ namespace cslox
             return value.ToString();
         }
 
-
+        
     }
 }

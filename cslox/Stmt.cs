@@ -1,17 +1,17 @@
 using System;
 namespace cslox
 {
-    public abstract class Stmt
-    {
-        public abstract R Accept<R>(IVisitor<R> visitor);
-        public interface IVisitor<R>
+        public abstract class Stmt
         {
-            R VisitBlockStmt(Block stmt);
-            R VisitExpressionStmt(Expression stmt);
-            R VisitIfStmt(If stmt);
-            R VisitPrintStmt(Print stmt);
-            R VisitVarStmt(Var stmt);
-        }
+            public abstract R Accept<R>(IVisitor<R> visitor);
+    public interface IVisitor<R>
+    {
+        R VisitBlockStmt(Block stmt);
+        R VisitExpressionStmt(Expression stmt);
+        R VisitIfStmt(If stmt);
+        R VisitPrintStmt(Print stmt);
+        R VisitVarStmt(Var stmt);
+    }
     }
     public class Block : Stmt
     {

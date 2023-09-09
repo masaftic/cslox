@@ -55,7 +55,7 @@ namespace cslox
 
         Stmt Statement()
         {
-            if (Match(TokenType.IF)) 
+            if (Match(TokenType.IF))
             {
                 return IfStatment();
             }
@@ -75,7 +75,7 @@ namespace cslox
             Consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
             Expr condition = Expression();
             Consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
-            
+
             Stmt thenBranch = Statement();
             Stmt? elseBranch = null;
             if (Match(TokenType.ELSE))
@@ -107,7 +107,7 @@ namespace cslox
 
         Expr Assignment()
         {
-            Expr expr = Equality();
+            Expr expr = Or();
 
             if (Match(TokenType.EQUAL))
             {
@@ -127,6 +127,34 @@ namespace cslox
             return expr;
         }
 
+        Expr Or()
+        {
+            Expr expr = And();
+
+            while (Match(TokenType.OR))
+            {
+                Token @operator = Previous();
+                Expr right = And();
+                expr = new Logical(expr, @operator, right);
+            }
+
+            return expr;
+        }
+
+        Expr And()
+        {
+            Expr expr = Equality();
+
+            while (Match(TokenType.AND))
+            {
+                Token @operator = Previous();
+                Expr right = Equality();
+                expr = new Logical(expr, @operator, right);
+            }
+
+            return expr;
+        }
+        
         Expr Equality()
         {
             Expr expr = Comparison();

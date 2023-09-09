@@ -30,6 +30,11 @@ namespace cslox
             return expr.value.ToString();
         }
 
+        public string VisitLogicalExpr(Logical expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VisitUnaryExpr(Unary expr)
         {
             return Parenthesize(expr.@operator.lexeme, expr.right);
