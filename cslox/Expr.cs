@@ -6,12 +6,12 @@ namespace cslox
         public abstract R Accept<R>(IVisitor<R> visitor);
         public interface IVisitor<R>
         {
-            R VisitAssignExpr(Assign assign);
-            R VisitBinaryExpr(Binary binary);
-            R VisitGroupingExpr(Grouping grouping);
-            R VisitLiteralExpr(Literal literal);
-            R VisitUnaryExpr(Unary unary);
-            R VisitVariableExpr(Variable variable);
+            R VisitAssignExpr(Assign expr);
+            R VisitBinaryExpr(Binary expr);
+            R VisitGroupingExpr(Grouping expr);
+            R VisitLiteralExpr(Literal expr);
+            R VisitUnaryExpr(Unary expr);
+            R VisitVariableExpr(Variable expr);
         }
     }
     public class Assign : Expr

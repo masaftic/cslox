@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Resources;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,9 +35,41 @@ namespace cslox
             statement.Accept(this);
         }
 
+        private void ExecuteBlock(List<Stmt> statements, Environment environment)
+        {
+            Environment previous = this.environment;
+
+            try
+            {
+                this.environment = environment;
+                foreach (Stmt statement in statements)
+                {
+                    Execute(statement);
+                }
+            }
+            finally
+            {
+                this.environment = previous;
+            }
+        }
+
         public object Evaluate(Expr expr)
         {
             return expr.Accept(this);
+        }
+
+        public object VisitIfStmt(If stmt)
+        {
+            if (IsTruthy(Evaluate(stmt.condition)))
+            {
+                Execute(stmt.thenBranch);
+            }
+            else if (stmt.elseBranch != null)
+            {
+                Execute(stmt.elseBranch);
+            }
+
+            return null;
         }
 
         public object VisitExpressionStmt(Expression stmt)
@@ -56,24 +89,6 @@ namespace cslox
         {
             ExecuteBlock(block.statements, new Environment(environment));
             return null;
-        }
-
-        private void ExecuteBlock(List<Stmt> statements, Environment environment)
-        {
-            Environment previous = this.environment;
-
-            try
-            {
-                this.environment = environment;
-                foreach (Stmt statement in statements)
-                {
-                    Execute(statement);
-                }
-            }
-            finally
-            {
-                this.environment = previous;
-            }
         }
 
         public object VisitVariableExpr(Variable expr)

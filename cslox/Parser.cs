@@ -55,6 +55,10 @@ namespace cslox
 
         Stmt Statement()
         {
+            if (Match(TokenType.IF)) 
+            {
+                return IfStatment();
+            }
             if (Match(TokenType.PRINT))
             {
                 return PrintStatement();
@@ -64,6 +68,22 @@ namespace cslox
                 return new Block(BlockStmts());
             }
             return ExpressionStatement();
+        }
+
+        Stmt IfStatment()
+        {
+            Consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
+            Expr condition = Expression();
+            Consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
+            
+            Stmt thenBranch = Statement();
+            Stmt? elseBranch = null;
+            if (Match(TokenType.ELSE))
+            {
+                elseBranch = Statement();
+            }
+
+            return new If(condition, thenBranch, elseBranch);
         }
 
         Stmt ExpressionStatement()

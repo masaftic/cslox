@@ -6,10 +6,11 @@ namespace cslox
         public abstract R Accept<R>(IVisitor<R> visitor);
         public interface IVisitor<R>
         {
-            R VisitBlockStmt(Block block);
-            R VisitExpressionStmt(Expression expression);
-            R VisitPrintStmt(Print print);
-            R VisitVarStmt(Var var);
+            R VisitBlockStmt(Block stmt);
+            R VisitExpressionStmt(Expression stmt);
+            R VisitIfStmt(If stmt);
+            R VisitPrintStmt(Print stmt);
+            R VisitVarStmt(Var stmt);
         }
     }
     public class Block : Stmt
@@ -41,6 +42,25 @@ namespace cslox
 
 
         public readonly Expr expression;
+    }
+    public class If : Stmt
+    {
+        public If(Expr condition, Stmt thenBranch, Stmt? elseBranch)
+        {
+            this.condition = condition;
+            this.thenBranch = thenBranch;
+            this.elseBranch = elseBranch;
+        }
+
+        public override R Accept<R>(IVisitor<R> visitor)
+        {
+            return visitor.VisitIfStmt(this);
+        }
+
+
+        public readonly Expr condition;
+        public readonly Stmt thenBranch;
+        public readonly Stmt? elseBranch;
     }
     public class Print : Stmt
     {

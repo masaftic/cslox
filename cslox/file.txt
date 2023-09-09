@@ -17,3 +17,13 @@ var c = "global c";
 print a;
 print b;
 print c;
+
+print true != false;
+
+if (1 + 2 == 2) {
+    print "nice";
+}
+else {
+    if (2 + 2 == 4) print "ez";
+    print "notNice";
+}

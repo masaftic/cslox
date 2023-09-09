@@ -30,6 +30,7 @@ public class GenerateAst
         {
             "Block      : List<Stmt> statements",
             "Expression : Expr expression",
+            "If         : Expr condition, Stmt thenBranch, Stmt? elseBranch",
             "Print      : Expr expression",
             "Var        : Token name, Expr? initializer"
         });
@@ -62,7 +63,7 @@ public class GenerateAst
     }
 
     //        "Binary : Expr Left, Token Operator, Expr Right",
-    
+
 
     static void DefineVisitor(StreamWriter writer, string baseName, List<string> types)
     {
@@ -71,7 +72,7 @@ public class GenerateAst
         foreach (string type in types)
         {
             string typeName = type.Split(':')[0].Trim();
-            writer.WriteLine($"        R Visit{typeName}{baseName}({typeName} {char.ToLower(typeName[0]) + typeName.Substring(1)});");
+            writer.WriteLine($"        R Visit{typeName}{baseName}({typeName} {char.ToLower(baseName[0]) + baseName.Substring(1)});");
         }
         writer.WriteLine("    }");
     }
