@@ -18,8 +18,8 @@ namespace cslox
     {
         public Assign(Token name, Expr value)
         {
-             this.name = name;
-             this.value = value;
+            this.name = name;
+            this.value = value;
         }
 
         public override R Accept<R>(IVisitor<R> visitor)
@@ -35,9 +35,9 @@ namespace cslox
     {
         public Binary(Expr left, Token @operator, Expr right)
         {
-             this.left = left;
-             this.@operator = @operator;
-             this.right = right;
+            this.left = left;
+            this.@operator = @operator;
+            this.right = right;
         }
 
         public override R Accept<R>(IVisitor<R> visitor)
@@ -54,7 +54,7 @@ namespace cslox
     {
         public Grouping(Expr expression)
         {
-             this.expression = expression;
+            this.expression = expression;
         }
 
         public override R Accept<R>(IVisitor<R> visitor)
@@ -69,7 +69,7 @@ namespace cslox
     {
         public Literal(object value)
         {
-             this.value = value;
+            this.value = value;
         }
 
         public override R Accept<R>(IVisitor<R> visitor)
@@ -84,8 +84,8 @@ namespace cslox
     {
         public Unary(Token @operator, Expr right)
         {
-             this.@operator = @operator;
-             this.right = right;
+            this.@operator = @operator;
+            this.right = right;
         }
 
         public override R Accept<R>(IVisitor<R> visitor)
@@ -101,7 +101,7 @@ namespace cslox
     {
         public Variable(Token name)
         {
-             this.name = name;
+            this.name = name;
         }
 
         public override R Accept<R>(IVisitor<R> visitor)

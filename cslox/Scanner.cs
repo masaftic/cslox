@@ -48,7 +48,7 @@ namespace cslox
         private bool IsAtEnd(int ahead = 0)
         {
             return current + ahead >= source.Length;
-        }   
+        }
 
         public List<Token> ScanTokens()
         {
@@ -88,7 +88,7 @@ namespace cslox
                     }
                     else
                     {
-                        AddToken(TokenType.SLASH); 
+                        AddToken(TokenType.SLASH);
                     }
                     break;
                 case ' ':
@@ -185,7 +185,7 @@ namespace cslox
         {
             while (Peek() != '"' && !IsAtEnd())
             {
-                if (Peek() == '\n') 
+                if (Peek() == '\n')
                 {
                     line++;
                 }
@@ -199,8 +199,8 @@ namespace cslox
             }
             // The closing "
             Advance();
-            
-            string value = source[(start+1)..(current-1)];
+
+            string value = source[(start + 1)..(current - 1)];
             AddToken(TokenType.STRING, value);
         }
 

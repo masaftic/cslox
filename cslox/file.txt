@@ -1,12 +1,19 @@
-
-var a = 1;
-var b = 2;
-var c = "Hello world";
-print a * b;
+var a = "global a";
+var b = "global b";
+var c = "global c";
+{
+  var a = "outer a";
+  var b = "outer b";
+  {
+    var a = "inner a";
+    print a;
+    print b;
+    print c;
+  }
+  print a;
+  print b;
+  print c;
+}
+print a;
+print b;
 print c;
-a = 5;
-c = "Hello";
-print a * b;
-print c;
-var d = 1;
-print d = 34;

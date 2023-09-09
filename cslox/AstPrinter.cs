@@ -1,9 +1,11 @@
 using System.Text;
 
-namespace cslox {
+namespace cslox
+{
     class AstPrinter : Expr.IVisitor<string>
     {
-        public string Print(Expr expr) {
+        public string Print(Expr expr)
+        {
             return expr.Accept(this);
         }
 
@@ -16,7 +18,7 @@ namespace cslox {
         {
             return Parenthesize(expr.@operator.lexeme, expr.left, expr.right);
         }
-        
+
         public string VisitGroupingExpr(Grouping expr)
         {
             return Parenthesize("group", expr.expression);
@@ -42,13 +44,13 @@ namespace cslox {
         {
             var builder = new StringBuilder();
             builder.Append('(').Append(name);
-            
+
             foreach (var expr in exprs)
             {
                 builder.Append(' ');
                 builder.Append(expr.Accept(this));
             }
-            
+
             builder.Append(')');
             return builder.ToString();
         }

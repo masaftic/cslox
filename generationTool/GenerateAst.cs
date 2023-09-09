@@ -28,6 +28,7 @@ public class GenerateAst
 
         DefineAst(outputDir, "Stmt", new List<string>
         {
+            "Block      : List<Stmt> statements",
             "Expression : Expr expression",
             "Print      : Expr expression",
             "Var        : Token name, Expr? initializer"
@@ -44,9 +45,9 @@ public class GenerateAst
             writer.WriteLine("using System;");
             writer.WriteLine("namespace cslox");
             writer.WriteLine("{");
-            writer.WriteLine("    public abstract class " + baseName);
-            writer.WriteLine("    {");
-            writer.WriteLine("        public abstract R Accept<R>(IVisitor<R> visitor);");
+            writer.WriteLine("        public abstract class " + baseName);
+            writer.WriteLine("        {");
+            writer.WriteLine("            public abstract R Accept<R>(IVisitor<R> visitor);");
             DefineVisitor(writer, baseName, types);
 
             writer.WriteLine("    }");
@@ -93,7 +94,7 @@ public class GenerateAst
         foreach (string field in fields)
         {
             string name = field.Trim().Split(' ')[1];
-            writer.WriteLine("             this." + name + " = " + name + ";");
+            writer.WriteLine("            this." + name + " = " + name + ";");
         }
 
         writer.WriteLine("        }");

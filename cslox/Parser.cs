@@ -33,7 +33,8 @@ namespace cslox
                 if (Match(TokenType.VAR)) return VarDeclaration();
 
                 return Statement();
-            } catch (ParseError error)
+            }
+            catch (ParseError error)
             {
                 Synchronize();
                 return null;
@@ -57,6 +58,10 @@ namespace cslox
             if (Match(TokenType.PRINT))
             {
                 return PrintStatement();
+            }
+            if (Match(TokenType.LEFT_BRACE))
+            {
+                return new Block(BlockStmts());
             }
             return ExpressionStatement();
         }
@@ -144,23 +149,23 @@ namespace cslox
 
         Expr Factor()
         {
-            Expr expr = Unary_();
+            Expr expr = @Unary();
             while (Match(TokenType.SLASH, TokenType.STAR))
             {
                 Token @operator = Previous();
-                Expr right = Unary_();
+                Expr right = @Unary();
                 expr = new Binary(expr, @operator, right);
             }
 
             return expr;
         }
 
-        Expr Unary_()
+        Expr @Unary()
         {
             if (Match(TokenType.BANG, TokenType.MINUS))
             {
                 Token @opeartor = Previous();
-                Expr right = Unary_();
+                Expr right = @Unary();
                 return new Unary(@opeartor, right);
             }
 
@@ -192,6 +197,18 @@ namespace cslox
 
 
             throw Error(Peek(), "Expect expression.");
+        }
+
+        List<Stmt> BlockStmts()
+        {
+            List<Stmt> statements = new();
+            while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
+            {
+                statements.Add(Declaration());
+            }
+
+            Consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+            return statements;
         }
 
         bool Match(params TokenType[] types)

@@ -22,7 +22,8 @@ namespace cslox
                 {
                     Execute(statement);
                 }
-            } catch (RuntimeError error)
+            }
+            catch (RuntimeError error)
             {
                 Lox.RuntimeError(error);
             }
@@ -40,7 +41,7 @@ namespace cslox
 
         public object VisitExpressionStmt(Expression stmt)
         {
-            Evaluate(stmt.expression); 
+            Evaluate(stmt.expression);
             return null;
         }
 
@@ -51,6 +52,29 @@ namespace cslox
             return null;
         }
 
+        public object VisitBlockStmt(Block block)
+        {
+            ExecuteBlock(block.statements, new Environment(environment));
+            return null;
+        }
+
+        private void ExecuteBlock(List<Stmt> statements, Environment environment)
+        {
+            Environment previous = this.environment;
+
+            try
+            {
+                this.environment = environment;
+                foreach (Stmt statement in statements)
+                {
+                    Execute(statement);
+                }
+            }
+            finally
+            {
+                this.environment = previous;
+            }
+        }
 
         public object VisitVariableExpr(Variable expr)
         {
@@ -126,7 +150,7 @@ namespace cslox
                     return null;
             }
         }
-     
+
         public object VisitGroupingExpr(Grouping expr)
         {
             return Evaluate(expr.expression);
@@ -200,6 +224,6 @@ namespace cslox
             return value.ToString();
         }
 
-        
+
     }
 }
