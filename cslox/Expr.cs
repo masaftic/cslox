@@ -1,19 +1,19 @@
 using System;
 namespace cslox
 {
-    public abstract class Expr
-    {
-        public abstract R Accept<R>(IVisitor<R> visitor);
-        public interface IVisitor<R>
+        public abstract class Expr
         {
-            R VisitAssignExpr(Assign expr);
-            R VisitBinaryExpr(Binary expr);
-            R VisitGroupingExpr(Grouping expr);
-            R VisitLiteralExpr(Literal expr);
-            R VisitLogicalExpr(Logical expr);
-            R VisitUnaryExpr(Unary expr);
-            R VisitVariableExpr(Variable expr);
-        }
+            public abstract R Accept<R>(IVisitor<R> visitor);
+    public interface IVisitor<R>
+    {
+        R VisitAssignExpr(Assign expr);
+        R VisitBinaryExpr(Binary expr);
+        R VisitGroupingExpr(Grouping expr);
+        R VisitLiteralExpr(Literal expr);
+        R VisitLogicalExpr(Logical expr);
+        R VisitUnaryExpr(Unary expr);
+        R VisitVariableExpr(Variable expr);
+    }
     }
     public class Assign : Expr
     {

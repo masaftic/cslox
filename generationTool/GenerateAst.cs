@@ -30,10 +30,12 @@ public class GenerateAst
         DefineAst(outputDir, "Stmt", new List<string>
         {
             "Block      : List<Stmt> statements",
+            "Break      : ",
             "Expression : Expr expression",
             "If         : Expr condition, Stmt thenBranch, Stmt? elseBranch",
             "Print      : Expr expression",
-            "Var        : Token name, Expr? initializer"
+            "Var        : Token name, Expr? initializer",
+            "While      : Expr condition, Stmt body"
         });
     }
 
@@ -86,7 +88,15 @@ public class GenerateAst
         // This is just a placeholder for demonstration purposes.
         writer.WriteLine("    public class " + className + " : " + baseName);
         writer.WriteLine("    {");
-        string[] fields = fieldList.Split(',');
+        string[] fields;
+        if (fieldList.Length == 0)
+        {
+            fields = new string[0];
+        }
+        else
+        {
+            fields = fieldList.Split(',');
+        }
         Console.WriteLine(fieldList);
 
 

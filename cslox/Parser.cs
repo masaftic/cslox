@@ -10,7 +10,7 @@ namespace cslox
 
         readonly List<Token> tokens;
         int current = 0;
-
+        int loopDepth = 0;
         public Parser(List<Token> tokens)
         {
             this.tokens = tokens;
@@ -67,7 +67,115 @@ namespace cslox
             {
                 return new Block(BlockStmts());
             }
+            if (Match(TokenType.WHILE))
+            {
+                return WhileStatement();
+            }
+            if (Match(TokenType.FOR))
+            {
+                return ForStatement();
+            }
+            if (Match(TokenType.BREAK))
+            {
+                return BreakStatement();
+            }
+
             return ExpressionStatement();
+        }
+
+        Stmt BreakStatement()
+        {
+            if (loopDepth == 0) 
+            {
+                Error(Previous(), "Must be inside a loop to use 'break'.");
+            }
+            Consume(TokenType.SEMICOLON, "Expect ';' after 'break'.");
+            return new Break();
+        }
+
+        Stmt ForStatement()
+        {
+            Consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
+
+            Stmt? initializer;
+            if (Match(TokenType.SEMICOLON))
+            {
+                initializer = null;
+            }
+            else if (Match(TokenType.VAR))
+            {
+                initializer = VarDeclaration();
+            }
+            else
+            {
+                initializer = ExpressionStatement();
+            }
+
+            Expr? condition = null;
+            if (!Check(TokenType.SEMICOLON))
+            {
+                condition = Expression();
+            }
+            Consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
+
+            Expr? increment = null;
+            if (!Check(TokenType.RIGHT_PAREN))
+            {
+                increment = Expression();
+            }
+            Consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
+
+            try
+            {
+                loopDepth++;
+
+                Stmt body = Statement();
+
+                if (increment is not null)
+                {
+                    body = new Block(new List<Stmt> {
+                        body,
+                        new Expression(increment)
+                    });
+                }
+
+                if (condition is null) condition = new Literal(true);
+
+                body = new While(condition, body);
+
+                if (initializer is not null)
+                {
+                    body = new Block(new List<Stmt>{
+                        initializer,
+                        body
+                    });
+                }
+
+                return body;
+            }
+            finally
+            {
+                loopDepth--;
+            }
+
+        }
+
+        Stmt WhileStatement()
+        {
+            Consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
+            Expr condition = Expression();
+            Consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
+            try
+            {
+                loopDepth++;
+                Stmt body = Statement();
+                return new While(condition, body);
+            }
+            finally
+            {
+                loopDepth--;
+            }
+
         }
 
         Stmt IfStatment()
@@ -154,7 +262,7 @@ namespace cslox
 
             return expr;
         }
-        
+
         Expr Equality()
         {
             Expr expr = Comparison();

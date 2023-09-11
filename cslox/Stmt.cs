@@ -7,10 +7,12 @@ namespace cslox
     public interface IVisitor<R>
     {
         R VisitBlockStmt(Block stmt);
+        R VisitBreakStmt(Break stmt);
         R VisitExpressionStmt(Expression stmt);
         R VisitIfStmt(If stmt);
         R VisitPrintStmt(Print stmt);
         R VisitVarStmt(Var stmt);
+        R VisitWhileStmt(While stmt);
     }
     }
     public class Block : Stmt
@@ -27,6 +29,19 @@ namespace cslox
 
 
         public readonly List<Stmt> statements;
+    }
+    public class Break : Stmt
+    {
+        public Break()
+        {
+        }
+
+        public override R Accept<R>(IVisitor<R> visitor)
+        {
+            return visitor.VisitBreakStmt(this);
+        }
+
+
     }
     public class Expression : Stmt
     {
@@ -93,5 +108,22 @@ namespace cslox
 
         public readonly Token name;
         public readonly Expr? initializer;
+    }
+    public class While : Stmt
+    {
+        public While(Expr condition, Stmt body)
+        {
+            this.condition = condition;
+            this.body = body;
+        }
+
+        public override R Accept<R>(IVisitor<R> visitor)
+        {
+            return visitor.VisitWhileStmt(this);
+        }
+
+
+        public readonly Expr condition;
+        public readonly Stmt body;
     }
 }

@@ -70,7 +70,7 @@ namespace cslox
                 {
                     Console.Write("> ");
                     string? line = input.ReadLine();
-                    if (line == null) break;
+                    if (line is null) break;
                     Run(line);
                     hadError = false;
                 }

@@ -26,7 +26,7 @@ namespace cslox
 
         public string VisitLiteralExpr(Literal expr)
         {
-            if (expr.value == null) return "nil";
+            if (expr.value is null) return "nil";
             return expr.value.ToString();
         }
 

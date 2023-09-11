@@ -12,8 +12,8 @@ namespace cslox
                         Stmt.IVisitor<object>
     {
 
+        class BreakException : Exception { }
         Environment environment = new();
-
 
         public void Interpret(List<Stmt> statements)
         {
@@ -105,6 +105,27 @@ namespace cslox
         {
             ExecuteBlock(block.statements, new Environment(environment));
             return null;
+        }
+
+
+        public object VisitWhileStmt(While stmt)
+        {
+            try {
+                while (IsTruthy(Evaluate(stmt.condition)))
+                {
+                    Execute(stmt.body);
+                }
+            }
+            catch (BreakException)
+            {
+
+            }
+            return null;
+        }
+
+        public object VisitBreakStmt(Break stmt)
+        {
+            throw new BreakException();
         }
 
         public object VisitVariableExpr(Variable expr)
@@ -226,7 +247,7 @@ namespace cslox
 
         static bool IsTruthy(object obj)
         {
-            if (obj == null) return false;
+            if (obj is null) return false;
             if (obj.GetType() == typeof(bool)) return (bool)obj;
             return true;
         }
@@ -238,7 +259,7 @@ namespace cslox
 
         private static string Stringify(object value)
         {
-            if (value == null) return "nil";
+            if (value is null) return "nil";
 
             if (value is double)
             {
