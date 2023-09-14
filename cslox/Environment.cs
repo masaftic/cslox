@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace cslox
 {
-    class Environment
+    public class Environment
     {
         public readonly Environment? enclosing;
-        readonly Dictionary<string, object> values = new();
+        readonly Dictionary<string, object?> values = new();
         
         public Environment()
         {
@@ -22,12 +22,12 @@ namespace cslox
         }
 
 
-        public void Define(string name, object value)
+        public void Define(string name, object? value)
         {
             values.Add(name, value);
         }
 
-        public object Get(Token name)
+        public object? Get(Token name)
         {                       
             if (values.ContainsKey(name.lexeme))
             {

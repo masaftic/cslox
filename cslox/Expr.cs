@@ -1,19 +1,20 @@
 using System;
 namespace cslox
 {
-        public abstract class Expr
-        {
-            public abstract R Accept<R>(IVisitor<R> visitor);
-    public interface IVisitor<R>
+    public abstract class Expr
     {
-        R VisitAssignExpr(Assign expr);
-        R VisitBinaryExpr(Binary expr);
-        R VisitGroupingExpr(Grouping expr);
-        R VisitLiteralExpr(Literal expr);
-        R VisitLogicalExpr(Logical expr);
-        R VisitUnaryExpr(Unary expr);
-        R VisitVariableExpr(Variable expr);
-    }
+        public abstract R Accept<R>(IVisitor<R> visitor);
+        public interface IVisitor<R>
+        {
+            R VisitAssignExpr(Assign expr);
+            R VisitBinaryExpr(Binary expr);
+            R VisitCallExpr(Call expr);
+            R VisitGroupingExpr(Grouping expr);
+            R VisitLiteralExpr(Literal expr);
+            R VisitLogicalExpr(Logical expr);
+            R VisitUnaryExpr(Unary expr);
+            R VisitVariableExpr(Variable expr);
+        }
     }
     public class Assign : Expr
     {
@@ -51,6 +52,25 @@ namespace cslox
         public readonly Token @operator;
         public readonly Expr right;
     }
+    public class Call : Expr
+    {
+        public Call(Expr callee, Token paren, List<Expr> arguments)
+        {
+            this.callee = callee;
+            this.paren = paren;
+            this.arguments = arguments;
+        }
+
+        public override R Accept<R>(IVisitor<R> visitor)
+        {
+            return visitor.VisitCallExpr(this);
+        }
+
+
+        public readonly Expr callee;
+        public readonly Token paren;
+        public readonly List<Expr> arguments;
+    }
     public class Grouping : Expr
     {
         public Grouping(Expr expression)
@@ -68,7 +88,7 @@ namespace cslox
     }
     public class Literal : Expr
     {
-        public Literal(object value)
+        public Literal(object? value)
         {
             this.value = value;
         }
@@ -79,7 +99,7 @@ namespace cslox
         }
 
 
-        public readonly object value;
+        public readonly object? value;
     }
     public class Logical : Expr
     {

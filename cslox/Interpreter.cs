@@ -8,12 +8,22 @@ using System.Threading.Tasks;
 
 namespace cslox
 {
-    class Interpreter : Expr.IVisitor<object>,
+    public partial class Interpreter : Expr.IVisitor<object>,
                         Stmt.IVisitor<object>
     {
 
-        class BreakException : Exception { }
-        Environment environment = new();
+        private class BreakException : Exception { }
+
+        public readonly Environment globals = new();
+        private Environment environment;
+
+        public Interpreter()
+        {
+            globals.Define("clock", new NativeClock());
+
+            
+            environment = globals;
+        }
 
         public void Interpret(List<Stmt> statements)
         {
@@ -30,12 +40,12 @@ namespace cslox
             }
         }
 
-        void Execute(Stmt statement)
+        public void Execute(Stmt statement)
         {
             statement.Accept(this);
         }
 
-        private void ExecuteBlock(List<Stmt> statements, Environment environment)
+        public void ExecuteBlock(List<Stmt> statements, Environment environment)
         {
             Environment previous = this.environment;
 
@@ -107,7 +117,6 @@ namespace cslox
             return null;
         }
 
-
         public object VisitWhileStmt(While stmt)
         {
             try {
@@ -128,14 +137,18 @@ namespace cslox
             throw new BreakException();
         }
 
-        public object VisitVariableExpr(Variable expr)
+        
+        public object VisitFunctionStmt(Function stmt)
         {
-            return environment.Get(expr.name);
+            LoxFunction function = new(stmt);
+            environment.Define(stmt.name.lexeme, function);
+
+            return null;
         }
 
         public object VisitVarStmt(Var stmt)
         {
-            object value = null;
+            object? value = null;
             if (stmt.initializer != null)
             {
                 value = Evaluate(stmt.initializer);
@@ -144,6 +157,11 @@ namespace cslox
             environment.Define(stmt.name.lexeme, value);
             return null;
         }
+        
+        public object VisitVariableExpr(Variable expr)
+        {
+            return environment.Get(expr.name);
+        }
 
         public object VisitAssignExpr(Assign expr)
         {
@@ -151,7 +169,36 @@ namespace cslox
             environment.Assign(expr.name, value);
             return value;
         }
+       
+        public object VisitCallExpr(Call expr)
+        {
+            object callee = Evaluate(expr.callee);
 
+            if (callee is not ILoxCallable) 
+            {
+                throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+            }
+
+            List<object> arguments = new();
+
+            foreach (Expr argument in expr.arguments)
+            {
+                arguments.Add(Evaluate(argument));
+            }
+
+            ILoxCallable function = (ILoxCallable)callee;
+
+            if (arguments.Count != function.Arity())
+            {
+                throw new RuntimeError(expr.paren, "Expected " +
+                    function.Arity() + " arguments but got " +
+                    arguments.Count + ".");
+            }
+
+            return function.Call(this, arguments);
+        }
+        
+        
         public object VisitBinaryExpr(Binary expr)
         {
             object left = Evaluate(expr.left);
@@ -245,7 +292,7 @@ namespace cslox
             throw new RuntimeError(@operator, "Operand must be a number");
         }
 
-        static bool IsTruthy(object obj)
+        private static bool IsTruthy(object obj)
         {
             if (obj is null) return false;
             if (obj.GetType() == typeof(bool)) return (bool)obj;
@@ -263,7 +310,7 @@ namespace cslox
 
             if (value is double)
             {
-                string text = value.ToString();
+                string? text = value.ToString();
                 if (text.EndsWith(".0"))
                 {
                     text = text.Substring(0, text.Length - 2);

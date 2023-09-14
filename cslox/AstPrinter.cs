@@ -19,6 +19,11 @@ namespace cslox
             return Parenthesize(expr.@operator.lexeme, expr.left, expr.right);
         }
 
+        public string VisitCallExpr(Call expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VisitGroupingExpr(Grouping expr)
         {
             return Parenthesize("group", expr.expression);

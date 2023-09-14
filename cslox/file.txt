@@ -7,3 +7,11 @@ for (var b = 1; b < 10000; b = temp + b) {
     temp = a;
     a = b;
 }
+
+
+fun sayHi(first, last) {
+  print "Hi, " + first + " " + last + "!";
+}
+
+sayHi("ez", "boi");
+sayHi("Dear", "Reader");

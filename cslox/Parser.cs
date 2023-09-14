@@ -8,9 +8,9 @@ namespace cslox
     {
         public class ParseError : Exception { }
 
-        readonly List<Token> tokens;
-        int current = 0;
-        int loopDepth = 0;
+        private readonly List<Token> tokens;
+        private int current = 0;
+        private int loopDepth = 0;
         public Parser(List<Token> tokens)
         {
             this.tokens = tokens;
@@ -26,11 +26,12 @@ namespace cslox
             return statements;
         }
 
-        Stmt Declaration()
+        private Stmt Declaration()
         {
             try
             {
                 if (Match(TokenType.VAR)) return VarDeclaration();
+                if (Match(TokenType.FUN)) return Function("function");
 
                 return Statement();
             }
@@ -41,7 +42,34 @@ namespace cslox
             }
         }
 
-        Stmt VarDeclaration()
+        private Stmt Function(string kind)
+        {
+            Token name = Consume(TokenType.IDENTIFIER, "Expect " + kind + " name.");
+
+            Consume(TokenType.LEFT_PAREN, "Expect '(' after " + kind + " name.");
+            List<Token> parameters = new();
+            if (!Check(TokenType.RIGHT_PAREN))
+            {
+                do
+                {
+                    if (parameters.Count >= 255)
+                    {
+                        Error(Peek(), "Can't have more than 255 parameters");
+                    }
+
+                    parameters.Add(Consume(TokenType.IDENTIFIER, "Expect parameter name."));
+                } while (Match(TokenType.COMMA));
+            }
+
+            Consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
+
+            Consume(TokenType.LEFT_BRACE, "Expect '{' before " + kind + " body.");
+            
+            List<Stmt> body = BlockStmts();
+            return new Function(name, parameters, body);
+        }
+
+        private Stmt VarDeclaration()
         {
             Token name = Consume(TokenType.IDENTIFIER, "Expect variable name.");
 
@@ -53,7 +81,7 @@ namespace cslox
             return new Var(name, initiallizer);
         }
 
-        Stmt Statement()
+        private Stmt Statement()
         {
             if (Match(TokenType.IF))
             {
@@ -82,18 +110,20 @@ namespace cslox
 
             return ExpressionStatement();
         }
-
-        Stmt BreakStatement()
+       
+        private List<Stmt> BlockStmts()
         {
-            if (loopDepth == 0) 
+            List<Stmt> statements = new();
+            while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
             {
-                Error(Previous(), "Must be inside a loop to use 'break'.");
+                statements.Add(Declaration());
             }
-            Consume(TokenType.SEMICOLON, "Expect ';' after 'break'.");
-            return new Break();
-        }
 
-        Stmt ForStatement()
+            Consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+            return statements;
+        }
+        
+        private Stmt ForStatement()
         {
             Consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
 
@@ -160,7 +190,7 @@ namespace cslox
 
         }
 
-        Stmt WhileStatement()
+        private Stmt WhileStatement()
         {
             Consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
             Expr condition = Expression();
@@ -178,7 +208,17 @@ namespace cslox
 
         }
 
-        Stmt IfStatment()
+        private Stmt BreakStatement()
+        {
+            if (loopDepth == 0)
+            {
+                Error(Previous(), "Must be inside a loop to use 'break'.");
+            }
+            Consume(TokenType.SEMICOLON, "Expect ';' after 'break'.");
+            return new Break();
+        }
+
+        private Stmt IfStatment()
         {
             Consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
             Expr condition = Expression();
@@ -194,26 +234,26 @@ namespace cslox
             return new If(condition, thenBranch, elseBranch);
         }
 
-        Stmt ExpressionStatement()
+        private Stmt ExpressionStatement()
         {
             Expr expr = Expression();
             Consume(TokenType.SEMICOLON, "Expect ';' after expression.");
             return new Expression(expr);
         }
 
-        Stmt PrintStatement()
+        private Stmt PrintStatement()
         {
             Expr value = Expression();
             Consume(TokenType.SEMICOLON, "Expect ';' after value.");
             return new Print(value);
         }
 
-        Expr Expression()
+        private Expr Expression()
         {
             return Assignment();
         }
 
-        Expr Assignment()
+        private Expr Assignment()
         {
             Expr expr = Or();
 
@@ -235,7 +275,7 @@ namespace cslox
             return expr;
         }
 
-        Expr Or()
+        private Expr Or()
         {
             Expr expr = And();
 
@@ -249,7 +289,7 @@ namespace cslox
             return expr;
         }
 
-        Expr And()
+        private Expr And()
         {
             Expr expr = Equality();
 
@@ -263,7 +303,7 @@ namespace cslox
             return expr;
         }
 
-        Expr Equality()
+        private Expr Equality()
         {
             Expr expr = Comparison();
             while (Match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL))
@@ -276,7 +316,7 @@ namespace cslox
             return expr;
         }
 
-        Expr Comparison()
+        private Expr Comparison()
         {
             Expr expr = Term();
 
@@ -290,7 +330,7 @@ namespace cslox
             return expr;
         }
 
-        Expr Term()
+        private Expr Term()
         {
             Expr expr = Factor();
             while (Match(TokenType.MINUS, TokenType.PLUS))
@@ -303,7 +343,7 @@ namespace cslox
             return expr;
         }
 
-        Expr Factor()
+        private Expr Factor()
         {
             Expr expr = @Unary();
             while (Match(TokenType.SLASH, TokenType.STAR))
@@ -316,7 +356,7 @@ namespace cslox
             return expr;
         }
 
-        Expr @Unary()
+        private Expr @Unary()
         {
             if (Match(TokenType.BANG, TokenType.MINUS))
             {
@@ -325,10 +365,45 @@ namespace cslox
                 return new Unary(@opeartor, right);
             }
 
-            return Primary();
+            return Call();
         }
 
-        Expr Primary()
+        private Expr FinishCall(Expr calle)
+        {
+            List<Expr> arguments = new();
+
+            if (!Check(TokenType.RIGHT_PAREN))
+            {
+                do
+                {
+                    if (arguments.Count >= 255)
+                    {
+                        Error(Peek(), "Can't have more than 255 arguments.");
+                    }
+                    arguments.Add(Expression());
+                }
+                while (Match(TokenType.COMMA));
+            }
+
+            Token paren = Consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
+
+            return new Call(calle, paren, arguments);
+        }
+
+        private Expr Call()
+        {
+            Expr expr = Primary();
+
+            while (true)
+            {
+                if (Match(TokenType.LEFT_PAREN)) expr = FinishCall(expr);
+                else break;
+            }
+
+            return expr;
+        }
+
+        private Expr Primary()
         {
             if (Match(TokenType.FALSE)) return new Literal(false);
             if (Match(TokenType.TRUE)) return new Literal(true);
@@ -355,19 +430,9 @@ namespace cslox
             throw Error(Peek(), "Expect expression.");
         }
 
-        List<Stmt> BlockStmts()
-        {
-            List<Stmt> statements = new();
-            while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
-            {
-                statements.Add(Declaration());
-            }
+        
 
-            Consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
-            return statements;
-        }
-
-        bool Match(params TokenType[] types)
+        private bool Match(params TokenType[] types)
         {
             foreach (TokenType type in types)
             {
@@ -381,19 +446,19 @@ namespace cslox
             return false;
         }
 
-        Token Consume(TokenType type, string message)
+        private Token Consume(TokenType type, string message)
         {
             if (Check(type)) return Advance();
             throw Error(Peek(), message);
         }
 
-        static ParseError Error(Token token, string message)
+        private static ParseError Error(Token token, string message)
         {
             Lox.Error(token, message);
             return new ParseError();
         }
 
-        void Synchronize()
+        private void Synchronize()
         {
             Advance();
 
@@ -417,29 +482,29 @@ namespace cslox
             }
         }
 
-        bool Check(TokenType type)
+        private bool Check(TokenType type)
         {
             if (IsAtEnd()) return false;
             return Peek().type == type;
         }
 
-        Token Advance()
+        private Token Advance()
         {
             if (!IsAtEnd()) current++;
             return Previous();
         }
 
-        bool IsAtEnd()
+        private bool IsAtEnd()
         {
             return Peek().type == TokenType.EOF;
         }
 
-        Token Peek()
+        private Token Peek()
         {
             return tokens.ElementAt(current);
         }
 
-        Token Previous()
+        private Token Previous()
         {
             return tokens.ElementAt(current - 1);
         }

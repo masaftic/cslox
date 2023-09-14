@@ -1,19 +1,20 @@
 using System;
 namespace cslox
 {
-        public abstract class Stmt
-        {
-            public abstract R Accept<R>(IVisitor<R> visitor);
-    public interface IVisitor<R>
+    public abstract class Stmt
     {
-        R VisitBlockStmt(Block stmt);
-        R VisitBreakStmt(Break stmt);
-        R VisitExpressionStmt(Expression stmt);
-        R VisitIfStmt(If stmt);
-        R VisitPrintStmt(Print stmt);
-        R VisitVarStmt(Var stmt);
-        R VisitWhileStmt(While stmt);
-    }
+        public abstract R Accept<R>(IVisitor<R> visitor);
+        public interface IVisitor<R>
+        {
+            R VisitBlockStmt(Block stmt);
+            R VisitBreakStmt(Break stmt);
+            R VisitExpressionStmt(Expression stmt);
+            R VisitIfStmt(If stmt);
+            R VisitFunctionStmt(Function stmt);
+            R VisitPrintStmt(Print stmt);
+            R VisitVarStmt(Var stmt);
+            R VisitWhileStmt(While stmt);
+        }
     }
     public class Block : Stmt
     {
@@ -76,6 +77,25 @@ namespace cslox
         public readonly Expr condition;
         public readonly Stmt thenBranch;
         public readonly Stmt? elseBranch;
+    }
+    public class Function : Stmt
+    {
+        public Function(Token name, List<Token> parameters, List<Stmt> body)
+        {
+            this.name = name;
+            this.parameters = parameters;
+            this.body = body;
+        }
+
+        public override R Accept<R>(IVisitor<R> visitor)
+        {
+            return visitor.VisitFunctionStmt(this);
+        }
+
+
+        public readonly Token name;
+        public readonly List<Token> parameters;
+        public readonly List<Stmt> body;
     }
     public class Print : Stmt
     {
