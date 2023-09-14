@@ -14,4 +14,19 @@ fun sayHi(first, last) {
 }
 
 sayHi("ez", "boi");
-sayHi("Dear", "Reader");
+
+
+var c1 = clock();
+
+
+fun counter(n) {
+    if (n > 1) counter(n - 1);
+    print n;
+}
+
+counter(1068);
+
+
+var c2 = clock();
+
+print c2 - c1;
