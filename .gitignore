@@ -365,3 +365,6 @@ FodyWeavers.xsd
 
 cslox/file.txt
 cslox/Properties/launchSettings.json
+.gitattributes
+.gitignore
+.vscode
