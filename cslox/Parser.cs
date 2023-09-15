@@ -107,10 +107,27 @@ namespace cslox
             {
                 return BreakStatement();
             }
+            if (Match(TokenType.RETURN))
+            {
+                return ReturnStatement();
+            }
 
             return ExpressionStatement();
         }
-       
+
+        private Stmt ReturnStatement()
+        {
+            Token keyword = Previous();
+            Expr? value = null;
+            if (!Check(TokenType.SEMICOLON))
+            {
+                value = Expression();
+            }
+
+            Consume(TokenType.SEMICOLON, "Expect ';' after return value.");
+            return new Return(keyword, value);
+        }
+
         private List<Stmt> BlockStmts()
         {
             List<Stmt> statements = new();

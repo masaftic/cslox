@@ -137,7 +137,14 @@ namespace cslox
             throw new BreakException();
         }
 
-        
+        public object VisitReturnStmt(Return stmt)
+        {
+            object? value = null;
+            if (stmt.value is not null) value = Evaluate(stmt.value);
+
+            throw new ReturnException(value);
+        }
+
         public object VisitFunctionStmt(Function stmt)
         {
             LoxFunction function = new(stmt);
@@ -275,7 +282,6 @@ namespace cslox
             // unreachable
             return null;
         }
-
 
 
         private static void CheckNumberOperands(Token @operator, object left, object right)

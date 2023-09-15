@@ -15,18 +15,16 @@ fun sayHi(first, last) {
 
 sayHi("ez", "boi");
 
+fun makeCounter() {
+  var i = 0;
+  fun count() {
+    i = i + 1;
+    print i;
+  }
 
-var c1 = clock();
-
-
-fun counter(n) {
-    if (n > 1) counter(n - 1);
-    print n;
+  return count;
 }
 
-counter(1068);
-
-
-var c2 = clock();
-
-print c2 - c1;
+var counter = makeCounter();
+counter(); // "1".
+counter(); // "2".

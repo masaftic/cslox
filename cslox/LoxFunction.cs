@@ -26,8 +26,15 @@ namespace cslox
                 environment.Define(declaration.parameters.ElementAt(i).lexeme, arguments.ElementAt(i));
             }
 
-
-            interpreter.ExecuteBlock(declaration.body, environment);
+            try
+            {
+                interpreter.ExecuteBlock(declaration.body, environment);
+            }
+            catch (ReturnException returnValue)
+            {
+                return returnValue.value;
+            }
+            
             return null;
         }
 
