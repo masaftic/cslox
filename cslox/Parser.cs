@@ -182,7 +182,7 @@ namespace cslox
                 {
                     body = new Block(new List<Stmt> {
                         body,
-                        new Expression(increment)
+                        new ExpressionStmt(increment)
                     });
                 }
 
@@ -255,7 +255,7 @@ namespace cslox
         {
             Expr expr = Expression();
             Consume(TokenType.SEMICOLON, "Expect ';' after expression.");
-            return new Expression(expr);
+            return new ExpressionStmt(expr);
         }
 
         private Stmt PrintStatement()

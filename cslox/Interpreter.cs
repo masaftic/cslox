@@ -15,6 +15,7 @@ namespace cslox
         private class BreakException : Exception { }
 
         public readonly Environment globals = new();
+  
         private Environment environment;
 
         public Interpreter()
@@ -82,23 +83,9 @@ namespace cslox
             return null;
         }
 
-        public object VisitLogicalExpr(Logical expr)
-        {
-            object left = Evaluate(expr.left);
-
-            if (expr.@operator.type == TokenType.OR)
-            {
-                if (IsTruthy(left)) return left;
-            }
-            else 
-            {
-                if (!IsTruthy(left)) return left;
-            }
-
-            return Evaluate(expr.right);
-        }
         
-        public object VisitExpressionStmt(Expression stmt)
+        
+        public object VisitExpressionStmt(ExpressionStmt stmt)
         {
             Evaluate(stmt.expression);
             return null;
@@ -165,6 +152,23 @@ namespace cslox
             return null;
         }
         
+
+        public object VisitLogicalExpr(Logical expr)
+        {
+            object left = Evaluate(expr.left);
+
+            if (expr.@operator.type == TokenType.OR)
+            {
+                if (IsTruthy(left)) return left;
+            }
+            else 
+            {
+                if (!IsTruthy(left)) return left;
+            }
+
+            return Evaluate(expr.right);
+        }
+
         public object VisitVariableExpr(Variable expr)
         {
             return environment.Get(expr.name);
@@ -204,8 +208,7 @@ namespace cslox
 
             return function.Call(this, arguments);
         }
-        
-        
+               
         public object VisitBinaryExpr(Binary expr)
         {
             object left = Evaluate(expr.left);
@@ -282,6 +285,9 @@ namespace cslox
             // unreachable
             return null;
         }
+
+
+
 
 
         private static void CheckNumberOperands(Token @operator, object left, object right)
