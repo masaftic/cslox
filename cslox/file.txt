@@ -8,23 +8,11 @@ for (var b = 1; b < 10000; b = temp + b) {
     a = b;
 }
 
+print "";
 
-fun sayHi(first, last) {
-  print "Hi, " + first + " " + last + "!";
+
+fun f () {
+    return nil;
 }
 
-sayHi("ez", "boi");
-
-fun makeCounter() {
-  var i = 0;
-  fun count() {
-    i = i + 1;
-    print i;
-  }
-
-  return count;
-}
-
-var counter = makeCounter();
-counter(); // "1".
-counter(); // "2".
+f();

@@ -134,7 +134,7 @@ namespace cslox
 
         public object VisitFunctionStmt(Function stmt)
         {
-            LoxFunction function = new(stmt);
+            LoxFunction function = new(stmt, environment);
             environment.Define(stmt.name.lexeme, function);
 
             return null;
@@ -152,6 +152,7 @@ namespace cslox
             return null;
         }
         
+
 
         public object VisitLogicalExpr(Logical expr)
         {

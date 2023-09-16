@@ -6,9 +6,11 @@ namespace cslox
     public class LoxFunction : ILoxCallable
     {
         private readonly Function declaration;
+        private readonly Environment closure;
 
-        public LoxFunction(Function declaration)
+        public LoxFunction(Function declaration, Environment closure)
         {
+            this.closure = closure;
             this.declaration = declaration;
         }
 
@@ -19,7 +21,7 @@ namespace cslox
 
         public object? Call(Interpreter interpreter, List<object> arguments)
         {
-            Environment environment = new(interpreter.globals);
+            Environment environment = new(closure);
 
             for (int i = 0; i < declaration.parameters.Count; i++)
             {
