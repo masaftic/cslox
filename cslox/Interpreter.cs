@@ -8,21 +8,22 @@ using System.Threading.Tasks;
 
 namespace cslox
 {
-    public partial class Interpreter : Expr.IVisitor<object>,
-                        Stmt.IVisitor<object>
+    public partial class Interpreter : Expr.IVisitor<object?>, Stmt.IVisitor<object?>
     {
 
         private class BreakException : Exception { }
+        private class ContinueException : Exception { }
 
-        public readonly Environment globals = new();
-  
+        private readonly Environment globals = new();
+        private readonly Dictionary<Expr, int> locals = new();
+
         private Environment environment;
 
         public Interpreter()
         {
             globals.Define("clock", new NativeClock());
 
-            
+
             environment = globals;
         }
 
@@ -44,6 +45,11 @@ namespace cslox
         public void Execute(Stmt statement)
         {
             statement.Accept(this);
+        }
+
+        internal void Resolve(Expr expr, int depth)
+        {
+            locals[expr] = depth;
         }
 
         public void ExecuteBlock(List<Stmt> statements, Environment environment)
@@ -69,7 +75,7 @@ namespace cslox
             return expr.Accept(this);
         }
 
-        public object VisitIfStmt(If stmt)
+        public object? VisitIfStmt(If stmt)
         {
             if (IsTruthy(Evaluate(stmt.condition)))
             {
@@ -83,30 +89,31 @@ namespace cslox
             return null;
         }
 
-        
-        
-        public object VisitExpressionStmt(ExpressionStmt stmt)
+
+
+        public object? VisitExpressionStmt(Expression stmt)
         {
             Evaluate(stmt.expression);
             return null;
         }
 
-        public object VisitPrintStmt(Print stmt)
+        public object? VisitPrintStmt(Print stmt)
         {
             object value = Evaluate(stmt.expression);
             Console.WriteLine(Stringify(value));
             return null;
         }
 
-        public object VisitBlockStmt(Block block)
+        public object? VisitBlockStmt(Block block)
         {
             ExecuteBlock(block.statements, new Environment(environment));
             return null;
         }
 
-        public object VisitWhileStmt(While stmt)
+        public object? VisitWhileStmt(While stmt)
         {
-            try {
+            try
+            {
                 while (IsTruthy(Evaluate(stmt.condition)))
                 {
                     Execute(stmt.body);
@@ -119,12 +126,13 @@ namespace cslox
             return null;
         }
 
-        public object VisitBreakStmt(Break stmt)
+        public object? VisitBreakStmt(Break stmt)
         {
             throw new BreakException();
         }
 
-        public object VisitReturnStmt(Return stmt)
+
+        public object? VisitReturnStmt(Return stmt)
         {
             object? value = null;
             if (stmt.value is not null) value = Evaluate(stmt.value);
@@ -132,7 +140,7 @@ namespace cslox
             throw new ReturnException(value);
         }
 
-        public object VisitFunctionStmt(Function stmt)
+        public object? VisitFunctionStmt(Function stmt)
         {
             LoxFunction function = new(stmt, environment);
             environment.Define(stmt.name.lexeme, function);
@@ -140,7 +148,7 @@ namespace cslox
             return null;
         }
 
-        public object VisitVarStmt(Var stmt)
+        public object? VisitVarStmt(Var stmt)
         {
             object? value = null;
             if (stmt.initializer != null)
@@ -151,10 +159,10 @@ namespace cslox
             environment.Define(stmt.name.lexeme, value);
             return null;
         }
-        
 
 
-        public object VisitLogicalExpr(Logical expr)
+
+        public object? VisitLogicalExpr(Logical expr)
         {
             object left = Evaluate(expr.left);
 
@@ -162,7 +170,7 @@ namespace cslox
             {
                 if (IsTruthy(left)) return left;
             }
-            else 
+            else
             {
                 if (!IsTruthy(left)) return left;
             }
@@ -170,23 +178,44 @@ namespace cslox
             return Evaluate(expr.right);
         }
 
-        public object VisitVariableExpr(Variable expr)
+        public object? VisitVariableExpr(Variable expr)
         {
-            return environment.Get(expr.name);
+            return LookUpVariable(expr.name, expr);
         }
 
-        public object VisitAssignExpr(Assign expr)
+        private object LookUpVariable(Token name, Expr expr)
+        {
+            if (locals.TryGetValue(expr, out int distance))
+            {
+                return environment.GetAt(distance, name.lexeme);
+            }
+            else 
+            {
+                return globals.Get(name);
+            }
+        }
+
+        public object? VisitAssignExpr(Assign expr)
         {
             object value = Evaluate(expr.value);
-            environment.Assign(expr.name, value);
+            
+            if (locals.TryGetValue(expr, out int distance))
+            {
+                environment.AssignAt(distance, expr.name, value);
+            }
+            else
+            {
+                globals.Assign(expr.name, value);
+            }
+
             return value;
         }
-       
-        public object VisitCallExpr(Call expr)
+
+        public object? VisitCallExpr(Call expr)
         {
             object callee = Evaluate(expr.callee);
 
-            if (callee is not ILoxCallable) 
+            if (callee is not ILoxCallable)
             {
                 throw new RuntimeError(expr.paren, "Can only call functions and classes.");
             }
@@ -209,8 +238,8 @@ namespace cslox
 
             return function.Call(this, arguments);
         }
-               
-        public object VisitBinaryExpr(Binary expr)
+
+        public object? VisitBinaryExpr(Binary expr)
         {
             object left = Evaluate(expr.left);
             object right = Evaluate(expr.right);
@@ -261,17 +290,17 @@ namespace cslox
             }
         }
 
-        public object VisitGroupingExpr(Grouping expr)
+        public object? VisitGroupingExpr(Grouping expr)
         {
             return Evaluate(expr.expression);
         }
 
-        public object VisitLiteralExpr(Literal expr)
+        public object? VisitLiteralExpr(Literal expr)
         {
             return expr.value;
         }
 
-        public object VisitUnaryExpr(Unary expr)
+        public object? VisitUnaryExpr(Unary expr)
         {
             object right = Evaluate(expr.right);
             switch (expr.@operator.type)
@@ -317,14 +346,14 @@ namespace cslox
             return Equals(left, right);
         }
 
-        private static string Stringify(object value)
+        private static string? Stringify(object value)
         {
             if (value is null) return "nil";
 
             if (value is double)
             {
                 string? text = value.ToString();
-                if (text.EndsWith(".0"))
+                if (text is not null && text.EndsWith(".0"))
                 {
                     text = text.Substring(0, text.Length - 2);
                 }
@@ -334,6 +363,6 @@ namespace cslox
             return value.ToString();
         }
 
-        
+
     }
 }

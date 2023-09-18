@@ -9,32 +9,32 @@ namespace cslox
     public class Environment
     {
         public readonly Environment? enclosing;
-        readonly Dictionary<string, object?> values = new();
-        
+        public readonly Dictionary<string, object?> values = new();
+
         public Environment()
         {
             enclosing = null;
         }
 
-        public Environment(Environment? enclosing) 
-        { 
-            this.enclosing = enclosing; 
+        public Environment(Environment? enclosing)
+        {
+            this.enclosing = enclosing;
         }
 
 
         public void Define(string name, object? value)
         {
-            values.Add(name, value);
+            values[name] = value;
         }
 
-        public object? Get(Token name)
-        {                       
+        public object Get(Token name)
+        {
             if (values.ContainsKey(name.lexeme))
             {
                 return values[name.lexeme];
             }
 
-            if (enclosing != null)
+            if (enclosing is not null)
             {
                 return enclosing.Get(name);
             }
@@ -50,13 +50,33 @@ namespace cslox
                 return;
             }
 
-            if (enclosing != null)
+            if (enclosing is not null)
             {
                 enclosing.Assign(name, value);
                 return;
             }
 
             throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+        }
+
+        internal object GetAt(int distance, string name)
+        {
+            return Ancestor(distance).values[name];
+        }
+
+        private Environment Ancestor(int distance)
+        {
+            Environment environment = this;
+            for (int i = 0; i < distance; i++)
+            {
+                environment = environment.enclosing;
+            }
+            return environment;
+        }
+
+        internal void AssignAt(int distance, Token name, object value)
+        {
+            Ancestor(distance).values[name.lexeme] = value;
         }
     }
 }

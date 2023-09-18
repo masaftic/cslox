@@ -8,7 +8,7 @@ namespace cslox
         {
             R VisitBlockStmt(Block stmt);
             R VisitBreakStmt(Break stmt);
-            R VisitExpressionStmt(ExpressionStmt stmt);
+            R VisitExpressionStmt(Expression stmt);
             R VisitIfStmt(If stmt);
             R VisitFunctionStmt(Function stmt);
             R VisitReturnStmt(Return stmt);
@@ -45,9 +45,9 @@ namespace cslox
 
 
     }
-    public class ExpressionStmt : Stmt
+    public class Expression : Stmt
     {
-        public ExpressionStmt(Expr expression)
+        public Expression(Expr expression)
         {
             this.expression = expression;
         }
