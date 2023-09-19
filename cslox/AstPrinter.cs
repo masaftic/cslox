@@ -50,6 +50,11 @@ namespace cslox
             throw new NotImplementedException();
         }
 
+        public string VisitThisExpr(This expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VisitUnaryExpr(Unary expr)
         {
             return Parenthesize(expr.@operator.lexeme, expr.right);

@@ -19,7 +19,7 @@ namespace cslox
             }
 
             LoxFunction? method = @class.FindMethod(name.lexeme);
-            if (method is not null) return method;
+            if (method is not null) return method.Bind(this);
             
             throw new RuntimeError(name, "Undefined property '" + name.lexeme + "'.");
         }

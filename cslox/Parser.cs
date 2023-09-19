@@ -442,6 +442,8 @@ namespace cslox
                 Consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
                 return new Grouping(expr);
             }
+            
+            if (Match(TokenType.THIS)) return new This(Previous());           
 
             if (Match(TokenType.IDENTIFIER))
             {

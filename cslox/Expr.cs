@@ -11,6 +11,7 @@ namespace cslox
             R VisitCallExpr(Call expr);
             R VisitGetExpr(Get expr);
             R VisitSetExpr(Set expr);
+            R VisitThisExpr(This expr);
             R VisitGroupingExpr(Grouping expr);
             R VisitLiteralExpr(Literal expr);
             R VisitLogicalExpr(Logical expr);
@@ -108,6 +109,21 @@ namespace cslox
         public readonly Expr @object;
         public readonly Token name;
         public readonly Expr value;
+    }
+    public class This : Expr
+    {
+        public This(Token keyword)
+        {
+            this.keyword = keyword;
+        }
+
+        public override R Accept<R>(IVisitor<R> visitor)
+        {
+            return visitor.VisitThisExpr(this);
+        }
+
+
+        public readonly Token keyword;
     }
     public class Grouping : Expr
     {

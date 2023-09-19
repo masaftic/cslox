@@ -9,6 +9,8 @@ namespace cslox
         private readonly Stack<Dictionary<string, bool>> scopes = new();
         private FunctionType currentFunction = FunctionType.NONE;
 
+        private ClassType currentClass = ClassType.NONE;
+
         public Resolver(Interpreter interpreter)
         {
             this.interpreter = interpreter;
@@ -22,6 +24,12 @@ namespace cslox
             METHOD
         }
 
+        private enum ClassType
+        {
+            NONE,
+            CLASS
+        }
+
         public object? VisitBlockStmt(Block stmt)
         {
             BeginScope();
@@ -33,8 +41,15 @@ namespace cslox
 
         public object? VisitClassStmt(Class stmt)
         {
+            ClassType enclosingClass = currentClass;
+            currentClass = ClassType.CLASS;
+
+
             Declare(stmt.name);
             Define(stmt.name);
+
+            BeginScope();
+            scopes.Peek()["this"] = true;
 
             foreach (Function method in stmt.methods)
             {
@@ -42,6 +57,9 @@ namespace cslox
                 ResolveFunction(method, declaration);
             }
 
+            EndScope();
+
+            currentClass = enclosingClass;
             return null;
         }
 
@@ -227,6 +245,18 @@ namespace cslox
         {
             Resolve(expr.value);
             Resolve(expr.@object);
+            return null;
+        }
+
+        public object? VisitThisExpr(This expr)
+        {
+            if (currentClass == ClassType.NONE)
+            {
+                Lox.Error(expr.keyword, "Can't use 'this' outside of a class.");
+                return null;
+            }
+
+            ResolveLocal(expr, expr.keyword);
             return null;
         }
 

@@ -210,6 +210,11 @@ namespace cslox
             return value;
         }
 
+        public object? VisitThisExpr(This expr)
+        {
+            return LookUpVariable(expr.keyword, expr);
+        }
+
         public object? VisitVariableExpr(Variable expr)
         {
             return LookUpVariable(expr.name, expr);

@@ -44,6 +44,13 @@ namespace cslox
         {
             return "<fn " + declaration.name.lexeme + ">";
         }
+
+        internal object Bind(LoxInstance instance)
+        {
+            Environment environment = new Environment(closure);
+            environment.Define("this", instance);
+            return new LoxFunction(declaration, environment);
+        }
     }
 
 
