@@ -7,9 +7,11 @@ namespace cslox
     {
         private readonly Function declaration;
         private readonly Environment closure;
+        private readonly bool isInitializer;
 
-        public LoxFunction(Function declaration, Environment closure)
+        public LoxFunction(Function declaration, Environment closure, bool isInitializer)
         {
+            this.isInitializer = isInitializer;
             this.closure = closure;
             this.declaration = declaration;
         }
@@ -34,8 +36,11 @@ namespace cslox
             }
             catch (ReturnException returnValue)
             {
+                if (isInitializer) return closure.GetAt(0, "this");
                 return returnValue.value;
             }
+
+            if (isInitializer) return closure.GetAt(0, "this");
             
             return null;
         }
@@ -49,7 +54,7 @@ namespace cslox
         {
             Environment environment = new Environment(closure);
             environment.Define("this", instance);
-            return new LoxFunction(declaration, environment);
+            return new LoxFunction(declaration, environment, isInitializer);
         }
     }
 

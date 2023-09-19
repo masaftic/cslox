@@ -16,12 +16,22 @@ namespace cslox
 
         public int Arity()
         {
-            return 0;
+            LoxFunction? initiallizer = FindMethod("init");
+            if (initiallizer is null) return 0;
+
+            return initiallizer.Arity();         
         }
 
         public object? Call(Interpreter interpreter, List<object> arguments)
         {
             LoxInstance instance = new LoxInstance(this);
+            LoxFunction? initializer = FindMethod("init");
+
+            if (initializer is not null)
+            {
+                ((LoxFunction)initializer.Bind(instance)).Call(interpreter, arguments);
+            }
+            
             return instance;
         }
 
@@ -32,9 +42,9 @@ namespace cslox
 
         internal LoxFunction? FindMethod(string name)
         {
-            if (methods.ContainsKey(name))
+            if (methods.TryGetValue(name, out LoxFunction? fun))
             {
-                return methods[name];
+                return fun;
             }
 
             return null;

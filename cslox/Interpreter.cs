@@ -117,7 +117,7 @@ namespace cslox
             Dictionary<string, LoxFunction> methods = new();
             foreach (Function method in stmt.methods)
             {
-                LoxFunction function = new LoxFunction(method, environment);
+                LoxFunction function = new LoxFunction(method, environment, method.name.lexeme == "init");
                 methods[method.name.lexeme] = function;
             }
 
@@ -159,7 +159,7 @@ namespace cslox
 
         public object? VisitFunctionStmt(Function stmt)
         {
-            LoxFunction function = new(stmt, environment);
+            LoxFunction function = new(stmt, environment, false);
             environment.Define(stmt.name.lexeme, function);
 
             return null;

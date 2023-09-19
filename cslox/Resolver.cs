@@ -21,6 +21,7 @@ namespace cslox
         {
             NONE,
             FUNCTION,
+            INITIALIZER,
             METHOD
         }
 
@@ -54,6 +55,10 @@ namespace cslox
             foreach (Function method in stmt.methods)
             {
                 FunctionType declaration = FunctionType.METHOD;
+                if (method.name.lexeme == "init")
+                {
+                    declaration = FunctionType.INITIALIZER;
+                }
                 ResolveFunction(method, declaration);
             }
 
@@ -273,7 +278,14 @@ namespace cslox
                 Lox.Error(stmt.keyword, "Can't return from top-level code.");
             }
             
-            if (stmt.value is not null) Resolve(stmt.value);
+            if (stmt.value is not null) 
+            {
+                if (currentFunction == FunctionType.INITIALIZER)
+                {
+                    Lox.Error(stmt.keyword, "Can't return a value from an initializer.");
+                }
+                Resolve(stmt.value);
+            }
             return null;
         }
 
