@@ -2,8 +2,8 @@
   "profiles": {
     "cslox": {
       "commandName": "Project",
-      "commandLineArgs": "F:\\Computer_Science\\Compilers\\FirstPart\\cslox\\cslox\\file.kt",
-      "//_cmdargs": "\"F:\\Computer Science\\Compilers\\FirstPart\\cslox\\cslox\\file.txt\""
+      "commandLineArgs": "F:\\Computer_Science\\Compilers\\FirstPart\\cslox\\cslox\\Lox.kt",
+      "//_cmdargs": "F:\\Computer Science\\Compilers\\FirstPart\\cslox\\cslox\\Lox.kt"
     }
   }
 }

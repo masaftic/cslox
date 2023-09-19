@@ -8,6 +8,7 @@ namespace cslox
         {
             R VisitBlockStmt(Block stmt);
             R VisitBreakStmt(Break stmt);
+            R VisitClassStmt(Class stmt);
             R VisitExpressionStmt(Expression stmt);
             R VisitIfStmt(If stmt);
             R VisitFunctionStmt(Function stmt);
@@ -44,6 +45,23 @@ namespace cslox
         }
 
 
+    }
+    public class Class : Stmt
+    {
+        public Class(Token name, List<Function> methods)
+        {
+            this.name = name;
+            this.methods = methods;
+        }
+
+        public override R Accept<R>(IVisitor<R> visitor)
+        {
+            return visitor.VisitClassStmt(this);
+        }
+
+
+        public readonly Token name;
+        public readonly List<Function> methods;
     }
     public class Expression : Stmt
     {

@@ -110,6 +110,23 @@ namespace cslox
             return null;
         }
 
+        public object? VisitClassStmt(Class stmt)
+        {
+            environment.Define(stmt.name.lexeme, null);
+
+            Dictionary<string, LoxFunction> methods = new();
+            foreach (Function method in stmt.methods)
+            {
+                LoxFunction function = new LoxFunction(method, environment);
+                methods[method.name.lexeme] = function;
+            }
+
+            LoxClass @class = new LoxClass(stmt.name.lexeme, methods);
+            environment.Assign(stmt.name, @class);
+
+            return null;
+        }
+
         public object? VisitWhileStmt(While stmt)
         {
             try
@@ -178,6 +195,21 @@ namespace cslox
             return Evaluate(expr.right);
         }
 
+        public object? VisitSetExpr(Set expr)
+        {
+            object @object = Evaluate(expr.@object);
+
+            if (@object is not LoxInstance)
+            {
+                throw new RuntimeError(expr.name, "Only instances have fields.");
+            }
+
+            object value = Evaluate(expr.value);
+            ((LoxInstance) @object).Set(expr.name, value);
+
+            return value;
+        }
+
         public object? VisitVariableExpr(Variable expr)
         {
             return LookUpVariable(expr.name, expr);
@@ -237,6 +269,17 @@ namespace cslox
             }
 
             return function.Call(this, arguments);
+        }
+
+        public object? VisitGetExpr(Get expr)
+        {
+            object @object = Evaluate(expr.@object);
+            if (@object is LoxInstance)
+            {
+                return ((LoxInstance) @object).Get(expr.name);
+            }
+
+            throw new RuntimeError(expr.name, "Only instances have properties.");
         }
 
         public object? VisitBinaryExpr(Binary expr)
@@ -365,4 +408,5 @@ namespace cslox
 
 
     }
+
 }

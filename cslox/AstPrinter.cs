@@ -24,6 +24,11 @@ namespace cslox
             throw new NotImplementedException();
         }
 
+        public string VisitGetExpr(Get expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VisitGroupingExpr(Grouping expr)
         {
             return Parenthesize("group", expr.expression);
@@ -36,6 +41,11 @@ namespace cslox
         }
 
         public string VisitLogicalExpr(Logical expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string VisitSetExpr(Set expr)
         {
             throw new NotImplementedException();
         }

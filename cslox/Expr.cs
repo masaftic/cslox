@@ -9,6 +9,8 @@ namespace cslox
             R VisitAssignExpr(Assign expr);
             R VisitBinaryExpr(Binary expr);
             R VisitCallExpr(Call expr);
+            R VisitGetExpr(Get expr);
+            R VisitSetExpr(Set expr);
             R VisitGroupingExpr(Grouping expr);
             R VisitLiteralExpr(Literal expr);
             R VisitLogicalExpr(Logical expr);
@@ -70,6 +72,42 @@ namespace cslox
         public readonly Expr callee;
         public readonly Token paren;
         public readonly List<Expr> arguments;
+    }
+    public class Get : Expr
+    {
+        public Get(Expr @object, Token name)
+        {
+            this.@object = @object;
+            this.name = name;
+        }
+
+        public override R Accept<R>(IVisitor<R> visitor)
+        {
+            return visitor.VisitGetExpr(this);
+        }
+
+
+        public readonly Expr @object;
+        public readonly Token name;
+    }
+    public class Set : Expr
+    {
+        public Set(Expr @object, Token name, Expr value)
+        {
+            this.@object = @object;
+            this.name = name;
+            this.value = value;
+        }
+
+        public override R Accept<R>(IVisitor<R> visitor)
+        {
+            return visitor.VisitSetExpr(this);
+        }
+
+
+        public readonly Expr @object;
+        public readonly Token name;
+        public readonly Expr value;
     }
     public class Grouping : Expr
     {

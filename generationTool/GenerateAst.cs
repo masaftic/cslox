@@ -15,16 +15,18 @@ public class GenerateAst
             Environment.Exit(64);
         }
         string outputDir = args[0];
-        Console.Write(outputDir);
+        //Console.Write(outputDir);
         DefineAst(outputDir, "Expr", new List<string>
         {
-            "Assign : Token name, Expr value",
-            "Binary : Expr left, Token @operator, Expr right",
+            "Assign   : Token name, Expr value",
+            "Binary   : Expr left, Token @operator, Expr right",
             "Call     : Expr callee, Token paren, List<Expr> arguments",
+            "Get      : Expr @object, Token name",
+            "Set      : Expr @object, Token name, Expr value",
             "Grouping : Expr expression",
-            "Literal : object? value",
+            "Literal  : object? value",
             "Logical  : Expr left, Token @operator, Expr right",
-            "Unary : Token @operator, Expr right",
+            "Unary    : Token @operator, Expr right",
             "Variable : Token name"
         });
 
@@ -32,6 +34,7 @@ public class GenerateAst
         {
             "Block      : List<Stmt> statements",
             "Break      : ",
+            "Class      : Token name, List<Function> methods",
             "Expression : Expr expression",
             "If         : Expr condition, Stmt thenBranch, Stmt? elseBranch",
             "Function   : Token name, List<Token> parameters, List<Stmt> body",
@@ -100,7 +103,7 @@ public class GenerateAst
         {
             fields = fieldList.Split(',');
         }
-        Console.WriteLine(fieldList);
+        //Console.WriteLine(fieldList);
 
 
         // constructor

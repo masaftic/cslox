@@ -32,6 +32,7 @@ namespace cslox
             {
                 if (Match(TokenType.VAR)) return VarDeclaration();
                 if (Match(TokenType.FUN)) return Function("function");
+                if (Match(TokenType.CLASS)) return ClassDeclaration();
 
                 return Statement();
             }
@@ -40,6 +41,22 @@ namespace cslox
                 Synchronize();
                 return null;
             }
+        }
+
+        private Stmt ClassDeclaration()
+        {
+            Token name = Consume(TokenType.IDENTIFIER, "Expect class name.");
+            Consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
+
+            List<Function> methods = new();
+            while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
+            {
+                methods.Add((Function)Function("method"));
+            }
+
+            Consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
+
+            return new Class(name, methods);
         }
 
         private Stmt Function(string kind)
@@ -285,6 +302,11 @@ namespace cslox
 
                     return new Assign(name, value);
                 }
+                else if (expr is Get)
+                {
+                    Get get = (Get)expr;
+                    return new Set(get.@object, get.name, value);
+                }
 
                 Error(equals, "Invalid assignment target.");
             }
@@ -385,28 +407,6 @@ namespace cslox
             return Call();
         }
 
-        private Expr FinishCall(Expr calle)
-        {
-            List<Expr> arguments = new();
-
-            if (!Check(TokenType.RIGHT_PAREN))
-            {
-                do
-                {
-                    if (arguments.Count >= 255)
-                    {
-                        Error(Peek(), "Can't have more than 255 arguments.");
-                    }
-                    arguments.Add(Expression());
-                }
-                while (Match(TokenType.COMMA));
-            }
-
-            Token paren = Consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
-
-            return new Call(calle, paren, arguments);
-        }
-
         private Expr Call()
         {
             Expr expr = Primary();
@@ -414,6 +414,11 @@ namespace cslox
             while (true)
             {
                 if (Match(TokenType.LEFT_PAREN)) expr = FinishCall(expr);
+                if (Match(TokenType.DOT))
+                {
+                    Token name = Consume(TokenType.IDENTIFIER, "Expect property name after '.'.");
+                    expr = new Get(expr, name);
+                }
                 else break;
             }
 
@@ -446,6 +451,30 @@ namespace cslox
 
             throw Error(Peek(), "Expect expression.");
         }
+
+        private Expr FinishCall(Expr calle)
+        {
+            List<Expr> arguments = new();
+
+            if (!Check(TokenType.RIGHT_PAREN))
+            {
+                do
+                {
+                    if (arguments.Count >= 255)
+                    {
+                        Error(Peek(), "Can't have more than 255 arguments.");
+                    }
+                    arguments.Add(Expression());
+                }
+                while (Match(TokenType.COMMA));
+            }
+
+            Token paren = Consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
+
+            return new Call(calle, paren, arguments);
+        }
+
+        
 
         
 

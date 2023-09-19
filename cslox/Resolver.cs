@@ -18,7 +18,8 @@ namespace cslox
         private enum FunctionType
         {
             NONE,
-            FUNCTION
+            FUNCTION,
+            METHOD
         }
 
         public object? VisitBlockStmt(Block stmt)
@@ -26,6 +27,20 @@ namespace cslox
             BeginScope();
             Resolve(stmt.statements);
             EndScope();
+
+            return null;
+        }
+
+        public object? VisitClassStmt(Class stmt)
+        {
+            Declare(stmt.name);
+            Define(stmt.name);
+
+            foreach (Function method in stmt.methods)
+            {
+                FunctionType declaration = FunctionType.METHOD;
+                ResolveFunction(method, declaration);
+            }
 
             return null;
         }
@@ -170,6 +185,12 @@ namespace cslox
             return null;
         }
 
+        public object? VisitGetExpr(Get expr)
+        {
+            Resolve(expr.@object);
+            return null;
+        }
+
         public object? VisitExpressionStmt(Expression stmt)
         {
             Resolve(stmt.expression);
@@ -199,6 +220,13 @@ namespace cslox
         {
             Resolve(expr.left);
             Resolve(expr.right);
+            return null;
+        }
+
+        public object? VisitSetExpr(Set expr)
+        {
+            Resolve(expr.value);
+            Resolve(expr.@object);
             return null;
         }
 
