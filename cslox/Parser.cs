@@ -36,7 +36,7 @@ namespace cslox
 
                 return Statement();
             }
-            catch (ParseError error)
+            catch (ParseError)
             {
                 Synchronize();
                 return null;
