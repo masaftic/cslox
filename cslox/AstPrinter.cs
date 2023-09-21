@@ -50,6 +50,11 @@ namespace cslox
             throw new NotImplementedException();
         }
 
+        public string VisitSuperExpr(Super expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VisitThisExpr(This expr)
         {
             throw new NotImplementedException();

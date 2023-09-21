@@ -1,22 +1,22 @@
 using System;
 namespace cslox
 {
-    public abstract class Stmt
-    {
-        public abstract R Accept<R>(IVisitor<R> visitor);
-        public interface IVisitor<R>
+        public abstract class Stmt
         {
-            R VisitBlockStmt(Block stmt);
-            R VisitBreakStmt(Break stmt);
-            R VisitClassStmt(Class stmt);
-            R VisitExpressionStmt(Expression stmt);
-            R VisitIfStmt(If stmt);
-            R VisitFunctionStmt(Function stmt);
-            R VisitReturnStmt(Return stmt);
-            R VisitPrintStmt(Print stmt);
-            R VisitVarStmt(Var stmt);
-            R VisitWhileStmt(While stmt);
-        }
+            public abstract R Accept<R>(IVisitor<R> visitor);
+    public interface IVisitor<R>
+    {
+        R VisitBlockStmt(Block stmt);
+        R VisitBreakStmt(Break stmt);
+        R VisitClassStmt(Class stmt);
+        R VisitExpressionStmt(Expression stmt);
+        R VisitIfStmt(If stmt);
+        R VisitFunctionStmt(Function stmt);
+        R VisitReturnStmt(Return stmt);
+        R VisitPrintStmt(Print stmt);
+        R VisitVarStmt(Var stmt);
+        R VisitWhileStmt(While stmt);
+    }
     }
     public class Block : Stmt
     {
@@ -48,9 +48,10 @@ namespace cslox
     }
     public class Class : Stmt
     {
-        public Class(Token name, List<Function> methods)
+        public Class(Token name, Variable? superclass, List<Function> methods)
         {
             this.name = name;
+            this.superclass = superclass;
             this.methods = methods;
         }
 
@@ -61,6 +62,7 @@ namespace cslox
 
 
         public readonly Token name;
+        public readonly Variable? superclass;
         public readonly List<Function> methods;
     }
     public class Expression : Stmt

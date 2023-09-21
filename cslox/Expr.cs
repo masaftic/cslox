@@ -1,23 +1,24 @@
 using System;
 namespace cslox
 {
-    public abstract class Expr
-    {
-        public abstract R Accept<R>(IVisitor<R> visitor);
-        public interface IVisitor<R>
+        public abstract class Expr
         {
-            R VisitAssignExpr(Assign expr);
-            R VisitBinaryExpr(Binary expr);
-            R VisitCallExpr(Call expr);
-            R VisitGetExpr(Get expr);
-            R VisitSetExpr(Set expr);
-            R VisitThisExpr(This expr);
-            R VisitGroupingExpr(Grouping expr);
-            R VisitLiteralExpr(Literal expr);
-            R VisitLogicalExpr(Logical expr);
-            R VisitUnaryExpr(Unary expr);
-            R VisitVariableExpr(Variable expr);
-        }
+            public abstract R Accept<R>(IVisitor<R> visitor);
+    public interface IVisitor<R>
+    {
+        R VisitAssignExpr(Assign expr);
+        R VisitBinaryExpr(Binary expr);
+        R VisitCallExpr(Call expr);
+        R VisitGetExpr(Get expr);
+        R VisitSetExpr(Set expr);
+        R VisitSuperExpr(Super expr);
+        R VisitThisExpr(This expr);
+        R VisitGroupingExpr(Grouping expr);
+        R VisitLiteralExpr(Literal expr);
+        R VisitLogicalExpr(Logical expr);
+        R VisitUnaryExpr(Unary expr);
+        R VisitVariableExpr(Variable expr);
+    }
     }
     public class Assign : Expr
     {
@@ -109,6 +110,23 @@ namespace cslox
         public readonly Expr @object;
         public readonly Token name;
         public readonly Expr value;
+    }
+    public class Super : Expr
+    {
+        public Super(Token keyword, Token method)
+        {
+            this.keyword = keyword;
+            this.method = method;
+        }
+
+        public override R Accept<R>(IVisitor<R> visitor)
+        {
+            return visitor.VisitSuperExpr(this);
+        }
+
+
+        public readonly Token keyword;
+        public readonly Token method;
     }
     public class This : Expr
     {

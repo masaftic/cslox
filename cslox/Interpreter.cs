@@ -112,7 +112,23 @@ namespace cslox
 
         public object? VisitClassStmt(Class stmt)
         {
+            object? superclass = null;
+            if (stmt.superclass is not null)
+            {
+                superclass = Evaluate(stmt.superclass);
+                if (superclass is not LoxClass)
+                {
+                    throw new RuntimeError(stmt.superclass.name, "Superclass must be a class.");
+                }
+            }
+
             environment.Define(stmt.name.lexeme, null);
+
+            if (stmt.superclass is not null)
+            {
+                environment = new Environment(environment);
+                environment.Define("super", superclass);
+            }
 
             Dictionary<string, LoxFunction> methods = new();
             foreach (Function method in stmt.methods)
@@ -121,7 +137,13 @@ namespace cslox
                 methods[method.name.lexeme] = function;
             }
 
-            LoxClass @class = new LoxClass(stmt.name.lexeme, methods);
+            LoxClass @class = new LoxClass(stmt.name.lexeme, (LoxClass)superclass, methods);
+
+            if (superclass is not null)
+            {
+                environment = environment.enclosing!;
+            }
+
             environment.Assign(stmt.name, @class);
 
             return null;
@@ -205,9 +227,24 @@ namespace cslox
             }
 
             object value = Evaluate(expr.value);
-            ((LoxInstance) @object).Set(expr.name, value);
+            ((LoxInstance)@object).Set(expr.name, value);
 
             return value;
+        }
+
+        public object? VisitSuperExpr(Super expr)
+        {
+            int distance = locals[expr];
+            LoxClass superclass = (LoxClass)environment.GetAt(distance, "super");
+            LoxInstance @object = (LoxInstance)environment.GetAt(distance - 1, "this");
+
+            LoxFunction? method = superclass.FindMethod(expr.method.lexeme);
+            if (method is null)
+            {
+                throw new RuntimeError(expr.method, "Undefined property '" + expr.method.lexeme + "'.");
+            }
+
+            return method.Bind(@object);
         }
 
         public object? VisitThisExpr(This expr)
@@ -226,7 +263,7 @@ namespace cslox
             {
                 return environment.GetAt(distance, name.lexeme);
             }
-            else 
+            else
             {
                 return globals.Get(name);
             }
@@ -235,7 +272,7 @@ namespace cslox
         public object? VisitAssignExpr(Assign expr)
         {
             object value = Evaluate(expr.value);
-            
+
             if (locals.TryGetValue(expr, out int distance))
             {
                 environment.AssignAt(distance, expr.name, value);
@@ -281,7 +318,7 @@ namespace cslox
             object @object = Evaluate(expr.@object);
             if (@object is LoxInstance)
             {
-                return ((LoxInstance) @object).Get(expr.name);
+                return ((LoxInstance)@object).Get(expr.name);
             }
 
             throw new RuntimeError(expr.name, "Only instances have properties.");

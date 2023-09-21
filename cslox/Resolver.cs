@@ -28,7 +28,8 @@ namespace cslox
         private enum ClassType
         {
             NONE,
-            CLASS
+            CLASS,
+            SUBCLASS
         }
 
         public object? VisitBlockStmt(Block stmt)
@@ -49,6 +50,25 @@ namespace cslox
             Declare(stmt.name);
             Define(stmt.name);
 
+            if (stmt.superclass is not null &&
+                stmt.name.lexeme == stmt.superclass.name.lexeme)
+            {
+                Lox.Error(stmt.superclass.name, "A class can't inherit from itself.");
+            }
+
+            if (stmt.superclass is not null)
+            {
+                currentClass = ClassType.SUBCLASS;
+                Resolve(stmt.superclass);
+            }
+            
+            if (stmt.superclass is not null)
+            {
+                BeginScope();
+                scopes.Peek()["super"] = true;
+            }
+            
+
             BeginScope();
             scopes.Peek()["this"] = true;
 
@@ -63,6 +83,11 @@ namespace cslox
             }
 
             EndScope();
+
+            if (stmt.superclass is not null)
+            {
+                EndScope();
+            }
 
             currentClass = enclosingClass;
             return null;
@@ -100,7 +125,7 @@ namespace cslox
             {
                 Lox.Error(expr.name, "Can't read local variable in its own initializer.");
             }
-            
+
             ResolveLocal(expr, expr.name);
             return null;
         }
@@ -115,7 +140,7 @@ namespace cslox
         }
 
         private void Resolve(Stmt stmt) => stmt.Accept(this);
-        
+
         private void Resolve(Expr expr) => expr.Accept(this);
 
 
@@ -190,7 +215,7 @@ namespace cslox
             Resolve(expr.right);
             return null;
         }
-      
+
         public object? VisitBreakStmt(Break stmt)
         {
             return null;
@@ -253,6 +278,20 @@ namespace cslox
             return null;
         }
 
+        public object? VisitSuperExpr(Super expr)
+        {
+            if (currentClass == ClassType.NONE)
+            {
+                Lox.Error(expr.keyword, "Can't use 'super' outside of a class.");
+            }
+            else if (currentClass != ClassType.SUBCLASS)
+            {
+                Lox.Error(expr.keyword, "Can't use 'super' in a class with no superclass.");
+            }
+            ResolveLocal(expr, expr.keyword);   
+            return null;
+        }
+
         public object? VisitThisExpr(This expr)
         {
             if (currentClass == ClassType.NONE)
@@ -277,8 +316,8 @@ namespace cslox
             {
                 Lox.Error(stmt.keyword, "Can't return from top-level code.");
             }
-            
-            if (stmt.value is not null) 
+
+            if (stmt.value is not null)
             {
                 if (currentFunction == FunctionType.INITIALIZER)
                 {
@@ -301,7 +340,7 @@ namespace cslox
             Resolve(stmt.body);
             return null;
         }
-        
+
     }
 
 

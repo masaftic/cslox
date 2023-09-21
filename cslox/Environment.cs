@@ -61,7 +61,7 @@ namespace cslox
 
         internal object GetAt(int distance, string name)
         {
-            return Ancestor(distance).values[name];
+            return Ancestor(distance).values[name]!;
         }
 
         private Environment Ancestor(int distance)
@@ -69,9 +69,9 @@ namespace cslox
             Environment environment = this;
             for (int i = 0; i < distance; i++)
             {
-                environment = environment.enclosing;
+                environment = environment.enclosing!;
             }
-            return environment;
+            return environment!;
         }
 
         internal void AssignAt(int distance, Token name, object value)

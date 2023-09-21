@@ -39,13 +39,20 @@ namespace cslox
             catch (ParseError)
             {
                 Synchronize();
-                return null;
+                return null!;
             }
         }
 
         private Stmt ClassDeclaration()
         {
             Token name = Consume(TokenType.IDENTIFIER, "Expect class name.");
+
+            Variable? superclass = null;
+            if (Match(TokenType.LESS))
+            {
+                Consume(TokenType.IDENTIFIER, "Expect superclass name.");
+                superclass = new Variable(Previous());
+            }
             Consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
 
             List<Function> methods = new();
@@ -56,7 +63,7 @@ namespace cslox
 
             Consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
 
-            return new Class(name, methods);
+            return new Class(name, superclass, methods);
         }
 
         private Stmt Function(string kind)
@@ -81,7 +88,7 @@ namespace cslox
             Consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
 
             Consume(TokenType.LEFT_BRACE, "Expect '{' before " + kind + " body.");
-            
+
             List<Stmt> body = BlockStmts();
             return new Function(name, parameters, body);
         }
@@ -156,7 +163,7 @@ namespace cslox
             Consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
             return statements;
         }
-        
+
         private Stmt ForStatement()
         {
             Consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
@@ -442,12 +449,20 @@ namespace cslox
                 Consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
                 return new Grouping(expr);
             }
-            
-            if (Match(TokenType.THIS)) return new This(Previous());           
+
+            if (Match(TokenType.THIS)) return new This(Previous());
 
             if (Match(TokenType.IDENTIFIER))
             {
                 return new Variable(Previous());
+            }
+
+            if (Match(TokenType.SUPER))
+            {
+                Token keyword = Previous();
+                Consume(TokenType.DOT, "Expect '.' after 'super'.");
+                Token method = Consume(TokenType.IDENTIFIER, "Expect superclass method name.");
+                return new Super(keyword, method);
             }
 
 
@@ -476,9 +491,9 @@ namespace cslox
             return new Call(calle, paren, arguments);
         }
 
-        
 
-        
+
+
 
         private bool Match(params TokenType[] types)
         {
