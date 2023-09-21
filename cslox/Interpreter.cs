@@ -22,6 +22,8 @@ namespace cslox
         public Interpreter()
         {
             globals.Define("clock", new NativeClock());
+            globals.Define("Read", new Read());
+            globals.Define("ReadNum", new ReadNum());
 
 
             environment = globals;
