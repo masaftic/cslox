@@ -11,7 +11,7 @@ namespace cslox
             this.@class = @class;
         }
 
-        public object Get(Token name)
+        public virtual object Get(Token name)
         {
             if (fields.ContainsKey(name.lexeme))
             {
@@ -29,7 +29,7 @@ namespace cslox
             return @class.name + " instance";
         }
 
-        public void Set(Token name, object value)
+        public virtual void Set(Token name, object value)
         {
             fields[name.lexeme] = value;
         }

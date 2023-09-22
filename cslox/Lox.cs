@@ -126,7 +126,6 @@ namespace cslox
         public static void RuntimeError(RuntimeError error)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            // Console.Error.WriteLine(error.Message + "\n[line " + error.token.line + "]");
             Console.Error.WriteLine(error.Message);
             Console.ResetColor();
             hadRuntimeError = true;

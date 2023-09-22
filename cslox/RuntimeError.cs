@@ -12,10 +12,6 @@ namespace cslox
     {
         private Token @operator;
 
-        public RuntimeError(string? message) : base(message)
-        {
-        }
-
         public RuntimeError(Token @operator, string message)
         {
             this.@operator = @operator;
