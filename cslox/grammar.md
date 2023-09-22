@@ -1,31 +1,71 @@
+program -> declaration* EOF
 
-```
-expression  → equality ;
-```
+declaration -> var_decl | function_decl | class_decl | statement   
 
-```
-equality    → comparison ( ( "!=" | "==" ) comparison )* ;
-```
+var_decl -> "var" IDENTIFIER ("=" expression)? ";"
 
-```
-comparison  → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
-```
+function_decl -> "fun" function
 
-```
-term        → factor ( ( "-" | "+" ) factor )* ;
-```
+class_decl -> "class" IDENTIFIER ("<" IDENTIFIER)? "{" function* "}"
 
-```
-factor      → unary ( ( "/" | "*" ) unary )* ;
-```
+function -> IDENTIFIER "(" parameters? ")" block
 
+parameters -> IDENTIFIER ("," IDENTIFIER)*
 
-```
-unary       → ( "!" | "-" ) unary
-            | primary ; 
-```
+statement -> block
+       | print_stmt
+       | if_stmt
+       | while_stmt
+       | for_stmt
+       | return_stmt
+       | expr_stmt
 
-```
-primary     → NUMBER | STRING | "true" | "false" | "nil"
-            | "(" expression ")" ;
-```
+block -> "{" declaration* "}"
+
+print_stmt -> "print" expression ";"
+
+if_stmt -> "if" "(" expression ")" statement ("else" statement)?
+
+while_stmt -> "while" "(" expression ")" statement
+
+for_stmt -> "for" "(" (var_decl | statement | ";")
+        expression? ";" expression? ")" statement
+
+        
+return_stmt -> "return" expression? ";"
+
+expr_stmt -> expression ";"
+
+expression -> assignment
+
+assignment -> (call ".")? IDENTIFIER "=" assignment | logical_or
+
+logical_or -> logical_and ("or" logical_and)*
+
+logical_and -> equality ("and" equality)*
+
+equality -> comparison (("==" | "!=") comparison)*
+
+comparison -> term ((">" | ">=" | "<" | "<=") term)*
+
+term -> factor (("+" / "-") factor)*
+
+factor -> unary (("*" / "/") unary)*
+
+unary -> ("-" | "!") unary | power
+
+power -> call ** power | call
+
+call -> primary ("(" arguments? ")")*
+
+arguments -> expression ("," expression)*
+
+primary -> INTEGER
+     | FLOAT
+     | STRING
+     | "true"
+     | "false"
+     | "nil"
+     | "(" expression ")"
+     | IDENTIFIER
+     | "super" "." IDENTIFIER
