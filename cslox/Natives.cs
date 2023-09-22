@@ -110,7 +110,7 @@ namespace cslox
                 private readonly List<object> elements;
                 public LoxList(int size) : base(null)
                 {
-                    elements = new List<object>(new object[10]);
+                    elements = new List<object>(new object[size]);
                 }
 
                 public override object Get(Token name)
