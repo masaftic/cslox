@@ -31,7 +31,7 @@ namespace cslox
         {
             if (values.ContainsKey(name.lexeme))
             {
-                return values[name.lexeme];
+                return values[name.lexeme]!;
             }
 
             if (enclosing is not null)

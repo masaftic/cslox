@@ -22,7 +22,7 @@ namespace cslox
         public Interpreter()
         {
             globals.Define("Clock", new NativeClock());
-            globals.Define("Input", new Input());
+            globals.Define("Scanner", new Input());
             globals.Define("List", new List());
 
 
